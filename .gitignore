@@ -1,0 +1,90 @@
+# ─── ADTC Competition — model weights must NEVER be committed ─────────────────
+*.gguf
+model/*.gguf
+model/
+
+# ─── llama.cpp binaries (installed locally, not committed) ───────────────────
+tools/llama/
+tools/llama-linux/
+tools/*.zip
+
+# ─── Python ────────────────────────────────────────────────────────────────────
+.venv/
+.venv-wsl/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ─── ADTC Profiler output ──────────────────────────────────────────────────────
+submission.json
+audit.json
+verdict.json
+baseline_*.json
+
+# ─── RAG / ChromaDB index (built at first run, not committed) ─────────────────
+data/chroma_db/
+data/embeddings/
+*.faiss
+*.pkl
+
+# ─── Environment and secrets ──────────────────────────────────────────────────
+.env
+*.env
+assets/env/
+
+# ─── IDE and OS ───────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Fine-tuning checkpoints (large, not committed) ──────────────────────────
+checkpoints/
+lora_weights/
+*.safetensors
+*.bin
+
+# ─── Flutter (desktop alternative implementation) ─────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+lib/*.g.dart
+lib/*.freezed.dart
+*.iml
+windows/flutter/ephemeral/
+linux/flutter/ephemeral/
+macos/Flutter/ephemeral/
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake

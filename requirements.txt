@@ -1,0 +1,39 @@
+# Maathai Desktop — Python Dependencies
+# Install: pip install -r requirements.txt
+#
+# All packages run 100% offline after initial installation.
+# No network calls are made during inference.
+
+# ─── Inference ────────────────────────────────────────────────────────────────
+# llama.cpp Python bindings (CPU-only build for ADTC target hardware)
+# Use --extra-index-url for prebuilt CPU wheels to avoid compiling from source
+llama-cpp-python>=0.2.90
+
+# ─── RAG — Embeddings ─────────────────────────────────────────────────────────
+# Local embedding model (all-MiniLM-L6-v2, ~23 MB, CPU-optimized)
+sentence-transformers>=3.0.0
+
+# ─── RAG — Vector Store ───────────────────────────────────────────────────────
+# ChromaDB embedded (SQLite backend, no server process required)
+chromadb>=0.5.0
+
+# ─── UI ───────────────────────────────────────────────────────────────────────
+PyQt6>=6.7.0
+
+# ─── System monitoring (for Benchmark panel and thermal checks) ───────────────
+psutil>=6.0.0
+
+# ─── Utilities ────────────────────────────────────────────────────────────────
+# Markdown rendering in UI
+markdown>=3.6
+
+# Configuration management
+python-dotenv>=1.0.0
+
+# ─── Testing ──────────────────────────────────────────────────────────────────
+pytest>=8.0.0
+pytest-timeout>=2.3.0
+
+# ─── Development (optional) ───────────────────────────────────────────────────
+# black>=24.0.0
+# ruff>=0.4.0

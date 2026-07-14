@@ -1,0 +1,37 @@
+{
+  "team_id": "1060310",
+  "domain": "agriculture",
+  "language_scope": ["en", "sw"],
+  "african_alpha_claim": true,
+  "budget_laptop_claim": true,
+  "submitter": {
+    "name": "Willy Tanui",
+    "email": "kipkirui.tanui@gmail.com",
+    "github_handle": "kipkirui"
+  },
+  "cross_disciplinary_pairing": {
+    "discipline": "agriculture",
+    "load_bearing": true,
+    "description": "Maathai Desktop pairs Qwen2.5-3B on-device inference with a production-grade offline Retrieval-Augmented Generation system built over a curated corpus of East African agricultural knowledge (crops, pests/diseases, livestock, soil, planting calendars, and market price data). The RAG layer is pure Dart TF-IDF with cosine similarity over bilingual JSON documents bundled as Flutter assets — zero external dependencies, sub-5ms retrieval, 100% offline. This is load-bearing: without RAG, the model cannot accurately distinguish Maize Lethal Necrosis from nitrogen deficiency, cite KALRO-recommended varieties, or provide season-specific planting guidance for specific East African regions. UI is fully bilingual in English and Swahili."
+  },
+  "test_prompts": [
+    {
+      "prompt_id": "tp_001",
+      "prompt": "My maize crop leaves are turning yellow with brown spots starting from the lower leaves and moving upward. The farm is in Nakuru, Kenya and we have had 3 weeks of dry weather with no rain. The plants are 8 weeks old. What disease or nutrient deficiency could this be, what is the recommended treatment, and is it safe to eat the maize if it recovers?"
+    },
+    {
+      "prompt_id": "tp_002",
+      "prompt": "I have 2 acres of land near Arusha, Tanzania with red volcanic soil and access to a borehole for irrigation. I want to start a commercial tomato farm for the first time this season. Which tomato varieties are best suited for this region, what is the full planting and harvesting schedule, what are the three most common diseases I should prepare to prevent, and what market price per kilogram can I realistically expect?"
+    }
+  ],
+  "model": {
+    "name": "Qwen2.5-3B-Instruct-Q4_K_M",
+    "runtime": "llama.cpp",
+    "quantization": "GGUF Q4_K_M",
+    "parameters_estimate": "3B",
+    "packaging": "binary_bundle"
+  },
+  "_runtime": {
+    "model_path": "model/qwen2.5-3b-instruct-q4_k_m.gguf"
+  }
+}

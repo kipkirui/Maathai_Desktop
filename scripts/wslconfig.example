@@ -1,0 +1,9 @@
+# Optional WSL2 tuning for ADTC-like profiling (copy to %USERPROFILE%\.wslconfig, then `wsl --shutdown`).
+#
+# Limits WSL to 4 logical CPUs — closer to the competition reference laptop and
+# reduces hyper-thread contention that depresses llama-bench TPS on dev machines.
+#
+# [wsl2]
+# memory=12GB
+# processors=4
+# swap=8GB

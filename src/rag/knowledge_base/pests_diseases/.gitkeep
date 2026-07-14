@@ -1,0 +1,4 @@
+# Add pest and disease reference sheets here as .md files.
+# Sources: CABI pest data sheets, crop-specific disease guides
+# Target: fall_armyworm.md, maize_stalk_borer.md, late_blight.md, coffee_berry_disease.md
+# Also import diagnosis_templates from the mobile app as .json

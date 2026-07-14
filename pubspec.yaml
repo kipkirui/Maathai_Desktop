@@ -1,0 +1,58 @@
+name: maathai_desktop
+description: "Offline AI agriculture advisor for the laptop Africa already has. ADTC 2026 submission."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  provider: ^6.1.2
+
+  # File system & paths
+  path_provider: ^2.1.4
+  path: ^1.9.0
+  file_picker: ^8.1.4
+
+  # HTTP (for llama-server local API — offline only, localhost)
+  http: ^1.1.0
+
+  # Persistence
+  shared_preferences: ^2.3.2
+  sqflite_common_ffi: ^2.3.4+4   # Desktop-compatible SQLite
+
+  # Markdown rendering for LLM responses
+  flutter_markdown: ^0.7.3
+
+  # UI
+  google_fonts: ^6.2.1
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.10+1
+
+  # Utilities
+  uuid: ^4.5.1
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/knowledge_base/crops/
+    - assets/knowledge_base/pests/
+    - assets/knowledge_base/soil/
+    - assets/knowledge_base/markets/
+    - assets/knowledge_base/calendars/
+    - assets/knowledge_base/livestock/
+    - assets/prompts/
+    - assets/i18n/
+    - assets/images/

@@ -1,0 +1,56 @@
+{
+  "nav_chat": "Mazungumzo",
+  "nav_knowledge": "Maarifa",
+  "nav_models": "Mifano",
+  "nav_settings": "Mipangilio",
+
+  "chat_empty_title": "Uliza Maathai chochote kuhusu shamba lako",
+  "chat_empty_subtitle": "100% bila mtandao · Qwen2.5-3B · Sekta ya kilimo",
+  "chat_placeholder": "Uliza kuhusu mazao, wadudu, magonjwa, udongo, masoko… (Ctrl+Enter kutuma)",
+
+  "quick_q1": "Kwa nini majani ya mahindi yanageuka njano?",
+  "quick_q2": "Jinsi ya kudhibiti viwavi vya jeshi?",
+  "quick_q3": "Nipande nyanya lini?",
+  "quick_q4": "Bei nzuri ya maharagwe ni ngapi?",
+
+  "send": "Tuma",
+  "stop": "Simama",
+  "clear_chat": "Futa mazungumzo",
+
+  "context_panel_title": "Muktadha wa Shamba",
+  "context_panel_subtitle": "Weka eneo na zao lako kwa ushauri maalum",
+  "context_region": "Eneo",
+  "context_crop": "Zao la Sasa",
+  "context_season": "Msimu",
+  "clear_context": "Futa Muktadha",
+
+  "search_knowledge": "Tafuta maarifa…",
+  "knowledge_select_hint": "Chagua makala kutoka kwenye orodha",
+  "no_results": "Hakuna matokeo",
+
+  "import_model": "Ingiza GGUF",
+  "no_models_title": "Hakuna mifano iliyopatikana",
+  "no_models_subtitle": "Endesha download_model.sh kupakua mfano wa mashindano,\nau ingiza faili la GGUF kutoka kwa kompyuta yako.",
+  "load_model": "Nenda kwa Mifano",
+  "retry": "Jaribu tena",
+
+  "no_model_loaded_banner": "Hakuna mfano uliopakiwa — nenda kwa Mifano kupakia faili la GGUF",
+  "model_loading_banner": "Inapakia mfano, tafadhali subiri…",
+  "model_error_banner": "Hitilafu ya mfano — angalia kichupo cha Mifano",
+  "model_import_copying": "Inakopi {file}… {percent}%",
+  "model_import_loading": "Inapakia {file} kwenye llama-server…",
+
+  "settings_language": "Lugha",
+  "settings_appearance": "Mwonekano",
+  "settings_model": "Mipangilio ya Mfano",
+  "settings_about": "Kuhusu",
+
+  "theme_system": "Mfumo wa default",
+  "theme_light": "Mwangaza",
+  "theme_dark": "Giza",
+
+  "temperature": "Joto (Temperature)",
+  "top_p": "Top-P",
+  "max_tokens": "Maneno ya juu",
+  "threads": "Nyuzi za CPU"
+}

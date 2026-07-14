@@ -1,0 +1,42 @@
+[
+  {
+    "id": "crop_kale_sukuma",
+    "title": "Kale (Sukuma Wiki) — East Africa Vegetable Guide",
+    "category": "crops",
+    "tags": ["kale", "sukuma wiki", "collard greens", "vegetable", "Kenya", "urban farming"],
+    "content": "## Kale / Sukuma Wiki (Brassica oleracea acephala)\n\nSukuma wiki is the most widely consumed leafy vegetable in urban and peri-urban East Africa.\n\n### Varieties\n\n- **Mfalme F1** — hybrid, high yield, 60 days to first harvest\n- **Collards Southern Georgia** — traditional OPV\n- **Thousand Headed** — long harvesting period\n\n### Planting\n\n- Can be direct seeded or nursery raised\n- Spacing: 30cm × 30cm (or 30cm × 45cm for large varieties)\n- Harvest leaves from bottom up — plant continues producing 3–6 months\n- Succession plant every 3 weeks for continuous supply\n\n### Fertilizer\n\n- Compost or well-decomposed manure 10 t/ha before planting\n- CAN topdress 100 kg/ha at 3 weeks and 6 weeks\n\n### Pests and Diseases\n\n- **Diamondback moth:** Bt spray or Spinetoram\n- **Aphids:** Neem or Dimethoate\n- **Black rot / downy mildew:** Crop rotation; avoid overhead irrigation",
+    "content_sw": "## Sukuma Wiki (Brassica oleracea)\n\nSukuma wiki ni mboga inayoliwa zaidi mijini Afrika Mashariki.\n\n### Upanzi\n\n- Umbali sentimita 30 × 30\n- Vuna majani kutoka chini kwenda juu — mmea unaendelea miezi 3–6\n\n### Mbolea\n\n- Mbolea ya asili tani 10/hekta; CAN kilo 100/hekta wiki 3 na 6"
+  },
+  {
+    "id": "crop_sweet_potato",
+    "title": "Sweet Potato — Food Security and Drought Crop",
+    "category": "crops",
+    "tags": ["sweet potato", "Ipomoea batatas", "Kenya", "drought", "OFSP", "orange flesh"],
+    "content": "## Sweet Potato (Ipomoea batatas)\n\nSweet potato is a key food security crop — vines survive drought and roots store well.\n\n### Varieties\n\n- **Kenya varieties:** Kabode (OFSP — high beta-carotene), Kenspot 1, Mugande\n- **Orange-fleshed (OFSP):** Combats vitamin A deficiency — promoted by CIP/KALRO\n- **White-fleshed:** Higher dry matter for processing\n\n### Planting\n\n- Propagate from vine cuttings (30cm length), not tubers\n- Plant at 30° angle, 2/3 buried; spacing 30cm × 90cm\n- Plant at onset of rains; mounds in heavy clay improve drainage\n- Maturity: 3–5 months depending on variety\n\n### Yield\n\n- 10–15 t/ha roots under good management; vines also used as livestock feed",
+    "content_sw": "## Viazi Vitamu (Ipomoea batatas)\n\nViazi vitamu ni zao la usalama wa chakula — vinastahimili ukame.\n\n### Aina\n\n- **Kabode (OFSP)** — rangi ya machungwa, vitamini A\n- **Kenspot 1, Mugande** — Kenya\n\n### Upanzi\n\n- Panda kwa makata ya matawi sentimita 30; umbali 30 × 90\n- Mavuno: miezi 3–5"
+  },
+  {
+    "id": "crop_banana",
+    "title": "Banana and Plantain — East Africa Production",
+    "category": "crops",
+    "tags": ["banana", "plantain", "matoke", "Uganda", "Kenya", "Tanzania", "BXW", "Fusarium"],
+    "content": "## Banana (Musa spp.) — East Africa\n\nBanana is a staple in Uganda (matoke), western Kenya, and Tanzania highlands.\n\n### Varieties\n\n- **East African Highland Banana (EAHB / matoke):** Cooking type; Uganda, western Kenya\n- **Cavendish (Grand Nain):** Dessert/export; Central Kenya\n- **FHIA 17, FHIA 23:** Improved cooking/dessert hybrids\n\n### Planting\n\n- Use disease-free tissue culture seedlings from certified nurseries\n- Spacing: 3m × 3m (≈1110 plants/ha)\n- Hole size: 60cm × 60cm × 60cm filled with topsoil + manure\n- First harvest: 12–15 months\n\n### Key Diseases\n\n- **Banana Xanthomonas Wilt (BXW):** Remove entire mat (corm + pseudostem); disinfect tools; no cure\n- **Fusarium wilt (Panama disease):** Use resistant varieties; avoid moving infected soil\n- **Black Sigatoka:** Mancozeb + oil spray program in export plantations",
+    "content_sw": "## Ndizi (Musa spp.)\n\nNdizi ni chakula cha msingi Uganda (matoke) na magharibi Kenya.\n\n### Aina\n\n- **EAHB / matoke** — za kupikia\n- **Cavendish** — za kula mbivu\n\n### Magonjwa\n\n- **BXW:** Ng'oa mzizi mzima; hakuna tiba — chanja zana\n- **Fusarium:** Tumia aina zinazostahimili"
+  },
+  {
+    "id": "crop_groundnut",
+    "title": "Groundnut (Peanut) — Oil and Protein Crop",
+    "category": "crops",
+    "tags": ["groundnut", "peanut", "Arachis hypogaea", "Kenya", "Malawi", "oil", "legume"],
+    "content": "## Groundnut (Arachis hypogaea)\n\nGroundnut is an important oil and protein legume in eastern and southern Africa.\n\n### Varieties\n\n- **ICGV-SM 90704, CG 7** — ICRISAT releases; drought tolerant\n- **Red Valencia** — popular local type in Kenya/Tanzania\n\n### Planting\n\n- Plant in well-drained sandy loam — does not tolerate waterlogging\n- Spacing: 45cm × 15cm; seed rate 80–100 kg/ha\n- Inoculate with rhizobium for nitrogen fixation on new fields\n- Calcium is critical for pod filling — apply gypsum 200 kg/ha on sandy soils\n\n### Harvest\n\n- Dig when leaves yellow and inner shell is dark (not white)\n- Dry pods to 8% moisture before storage to prevent aflatoxin",
+    "content_sw": "## Njugu Karanga (Arachis hypogaea)\n\nNjugu ni zao la mafuta na protini Afrika mashariki.\n\n### Upanzi\n\n- Udongo wa mchanga unaodrain vizuri\n- Umbali sentimita 45 × 15\n- Weka gypsum kilo 200/hekta kwenye udongo wa mchanga kwa pod vizuri"
+  },
+  {
+    "id": "crop_soybean",
+    "title": "Soybean — Protein and Soil Fertility Crop",
+    "category": "crops",
+    "tags": ["soybean", "soya", "Glycine max", "legume", "inoculant", "Kenya", "rotation"],
+    "content": "## Soybean (Glycine max)\n\nSoybean is expanding in East Africa for human nutrition, animal feed, and crop rotation.\n\n### Varieties\n\n- **SB 19, SB 24** — Kenya releases; 90–110 days\n- **Maksoy 3N** — Uganda\n\n### Planting\n\n- Inoculate seed with Bradyrhizobium japonicum before planting\n- Spacing: 50cm × 5cm; seed rate 60–80 kg/ha\n- Plant at onset of rains; do not waterlog\n\n### Uses\n\n- Human consumption (soy milk, tofu, mixed flour)\n- Livestock feed (soybean meal)\n- Nitrogen fixation improves soil for following maize crop — 40–60 kg N/ha equivalent",
+    "content_sw": "## Soya (Glycine max)\n\nSoya inapanuka Afrika Mashariki kwa lishe na mzunguko wa mazao.\n\n### Upanzi\n\n- Chanja mbegu na Bradyrhizobium kabla ya kupanda\n- Umbali sentimita 50 × 5\n- Inafuga nitrojeni — nzuri kabla ya mahindi"
+  }
+]

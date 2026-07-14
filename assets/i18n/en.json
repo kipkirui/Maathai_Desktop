@@ -1,0 +1,56 @@
+{
+  "nav_chat": "Chat",
+  "nav_knowledge": "Knowledge",
+  "nav_models": "Models",
+  "nav_settings": "Settings",
+
+  "chat_empty_title": "Ask Maathai anything about your farm",
+  "chat_empty_subtitle": "Fully offline · Powered by Qwen2.5-3B · Agriculture domain",
+  "chat_placeholder": "Ask about crops, pests, diseases, soil, markets… (Ctrl+Enter to send)",
+
+  "quick_q1": "Why are my maize leaves turning yellow?",
+  "quick_q2": "How do I control Fall Armyworm?",
+  "quick_q3": "When should I plant tomatoes?",
+  "quick_q4": "What is a good price for beans?",
+
+  "send": "Send",
+  "stop": "Stop",
+  "clear_chat": "Clear chat",
+
+  "context_panel_title": "Farm Context",
+  "context_panel_subtitle": "Set your location & crop for tailored advice",
+  "context_region": "Region",
+  "context_crop": "Active Crop",
+  "context_season": "Season",
+  "clear_context": "Clear Context",
+
+  "search_knowledge": "Search knowledge base…",
+  "knowledge_select_hint": "Select an article from the list",
+  "no_results": "No results found",
+
+  "import_model": "Import GGUF",
+  "no_models_title": "No models found",
+  "no_models_subtitle": "Run download_model.sh to download the competition model,\nor import a GGUF file from your computer.",
+  "load_model": "Go to Models",
+  "retry": "Retry",
+
+  "no_model_loaded_banner": "No model loaded — go to Models to load a GGUF file",
+  "model_loading_banner": "Loading model, please wait…",
+  "model_error_banner": "Model error — check Models tab",
+  "model_import_copying": "Copying {file}… {percent}%",
+  "model_import_loading": "Loading {file} into llama-server…",
+
+  "settings_language": "Language",
+  "settings_appearance": "Appearance",
+  "settings_model": "Model Parameters",
+  "settings_about": "About",
+
+  "theme_system": "System default",
+  "theme_light": "Light",
+  "theme_dark": "Dark",
+
+  "temperature": "Temperature",
+  "top_p": "Top-P",
+  "max_tokens": "Max tokens",
+  "threads": "CPU threads"
+}
