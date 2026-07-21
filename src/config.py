@@ -34,10 +34,13 @@ MODEL_FILENAME = MODEL_PATH.name
 # Ported from ModelController.dart in the Maathai mobile app
 INFERENCE_CONFIG = {
     "n_ctx": 4096,          # context window
-    "n_threads": 4,         # match ADTC 4 vCPU; do not exceed to avoid thermal throttling
-    "n_batch": 2048,        # llama.cpp default; matches adtc-profiler llama-bench
+    "n_threads": 4,         # ADTC 4 vCPU; >4 lowers TPS
+    "n_batch": 2048,        # best gen TPS in WSL batch sweep
+    "n_ubatch": 512,        # physical micro-batch
     "n_gpu_layers": 0,      # no discrete GPU on ADTC target hardware
-    "use_mmap": True,       # llama-bench default; faster load + inference
+    "flash_attn": True,     # ~15% gen TPS gain vs off on Qwen2.5-3B
+    "use_mlock": True,      # keep weights resident; peak RSS still ~3.3 GB
+    "use_mmap": True,       # faster than no-mmap in sweeps
     "verbose": False,       # suppress llama.cpp log spam
 }
 

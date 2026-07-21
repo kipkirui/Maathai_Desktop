@@ -31,10 +31,15 @@ class LlmService {
     int port = AppConfig.llamaServerPort,
     int contextSize = AppConfig.defaultContextSize,
     int threads = AppConfig.defaultThreads,
-    int threadsBatch = AppConfig.defaultThreads,
+    int threadsBatch = AppConfig.defaultThreadsBatch,
     int gpuLayers = AppConfig.defaultGpuLayers,
     int batchSize = AppConfig.defaultBatchSize,
     int ubatchSize = AppConfig.defaultUbatchSize,
+    bool flashAttn = AppConfig.defaultFlashAttn,
+    bool mlock = AppConfig.defaultMlock,
+    int processPrio = AppConfig.defaultProcessPrio,
+    String cacheTypeK = AppConfig.defaultCacheTypeK,
+    String cacheTypeV = AppConfig.defaultCacheTypeV,
     int timeoutSeconds = 60,
   }) async {
     await stopServer();
@@ -52,8 +57,9 @@ class LlmService {
       );
     }
 
-    final args = [
+    final args = <String>[
       '--model', modelPath,
+      '--host', AppConfig.llamaServerHost,
       '--port', port.toString(),
       '--ctx-size', contextSize.toString(),
       '--threads', threads.toString(),
@@ -61,12 +67,32 @@ class LlmService {
       '--n-gpu-layers', gpuLayers.toString(),
       '--batch-size', batchSize.toString(),
       '--ubatch-size', ubatchSize.toString(),
-      // mmap left enabled (llama-bench default); peak RAM ~3.3 GB on 3B Q4_K_M — well under 7168 MB
-      '--log-disable',    // Suppress verbose logs
+      '--flash-attn', flashAttn ? 'on' : 'off',
+      '--cache-type-k', cacheTypeK,
+      '--cache-type-v', cacheTypeV,
+      '--prio', processPrio.toString(),
+      // mmap left enabled (faster TPS than --no-mmap in sweeps)
+      if (mlock) '--mlock',
+      '--log-disable',
     ];
 
-    _serverProcess = await Process.start(binary, args);
-    AppLog.info('LlmService', 'Started llama-server: $binary (port $_port)');
+    // Cap BLAS/OpenMP to the same thread budget so they don't oversubscribe
+    // the 4 vCPUs the ADTC profiler / laptop profile expose.
+    final env = <String, String>{
+      ...Platform.environment,
+      'OMP_NUM_THREADS': threads.toString(),
+      'OPENBLAS_NUM_THREADS': threads.toString(),
+      'GGML_BLAS_NUM_THREADS': threads.toString(),
+      'MKL_NUM_THREADS': threads.toString(),
+    };
+
+    _serverProcess = await Process.start(binary, args, environment: env);
+    AppLog.info(
+      'LlmService',
+      'Started llama-server: $binary '
+      '(t=$threads tb=$threadsBatch b=$batchSize ub=$ubatchSize '
+      'fa=${flashAttn ? 'on' : 'off'} mlock=$mlock prio=$processPrio)',
+    );
 
     // Forward server stderr to console in debug mode
     _serverLogSub = _serverProcess!.stderr

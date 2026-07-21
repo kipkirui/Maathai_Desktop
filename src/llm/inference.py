@@ -157,6 +157,8 @@ class LlamaInference:
             n_batch=INFERENCE_CONFIG["n_batch"],
             n_gpu_layers=INFERENCE_CONFIG["n_gpu_layers"],
             use_mmap=INFERENCE_CONFIG["use_mmap"],
+            use_mlock=INFERENCE_CONFIG.get("use_mlock", False),
+            flash_attn=INFERENCE_CONFIG.get("flash_attn", False),
             verbose=INFERENCE_CONFIG["verbose"],
         )
         self._model_path = model_path

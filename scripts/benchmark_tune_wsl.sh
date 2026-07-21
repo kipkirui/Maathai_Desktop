@@ -78,5 +78,12 @@ echo ""
 echo "--- Competition exact command ---"
 run_bench "profiler default" -m "$MODEL" -p 512 -n 128 -t 4
 echo ""
+
+echo "--- Flash attention (t=4 -b 2048) ---"
+run_bench "fa=on"  -m "$MODEL" -p 512 -n 128 -t 4 -b 2048 -fa on
+run_bench "fa=off" -m "$MODEL" -p 512 -n 128 -t 4 -b 2048 -fa off
+echo ""
+
 echo "Target: >= 10 t/s minimum (tests), >= 15 t/s for full Sperf score"
 echo "Hard gate: peak RAM < 7168 MB (run adtc-profiler for official numbers)"
+echo "App defaults: --threads 4 --batch-size 2048 --flash-attn on --mlock"

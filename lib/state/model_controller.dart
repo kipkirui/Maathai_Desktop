@@ -101,8 +101,15 @@ class ModelController extends ChangeNotifier {
         port: AppConfig.llamaServerPort,
         contextSize: contextSize,
         threads: threads,
+        threadsBatch: AppConfig.defaultThreadsBatch,
         gpuLayers: AppConfig.defaultGpuLayers,
         batchSize: AppConfig.defaultBatchSize,
+        ubatchSize: AppConfig.defaultUbatchSize,
+        flashAttn: AppConfig.defaultFlashAttn,
+        mlock: AppConfig.defaultMlock,
+        processPrio: AppConfig.defaultProcessPrio,
+        cacheTypeK: AppConfig.defaultCacheTypeK,
+        cacheTypeV: AppConfig.defaultCacheTypeV,
       );
       _loadedModelPath = modelPath;
       _status = ModelStatus.ready;

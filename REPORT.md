@@ -74,20 +74,28 @@ GGUF Q4_K_M was selected for the following reasons, consistent with our mobile a
 
 ### Inference runtime
 
-`llama.cpp` via `llama-server` (HTTP/SSE on localhost) is the only permitted runtime. Key configuration for the ADTC standard laptop:
+`llama.cpp` via `llama-server` (HTTP/SSE on localhost) is the only permitted runtime. Key configuration for the ADTC standard laptop (tuned with `scripts/benchmark_tune_wsl.sh` + `scripts/benchmark_extra_flags_wsl.sh`):
 
 ```
-n_ctx      = 4096     # sufficient for RAG context + prompt
-n_threads  = 4        # matches ADTC 4 vCPU profile; avoids thermal pressure from over-threading
-n_gpu_layers = 0      # integrated GPU only; CPU inference
-temperature = 0.7     # balanced creativity/determinism for advisory tasks
-top_k       = 40      # from Maathai mobile app production config
-top_p       = 0.95
-repeat_penalty = 1.1  # reduces repetitive advice patterns
-max_tokens  = 512     # dynamic: context_length − prompt_tokens − 100
+n_ctx           = 4096     # RAG context + prompt budget
+n_threads       = 4        # ADTC 4 vCPU; >4 oversubscribes and lowers TPS
+n_threads_batch = 4        # match prompt processing to gen threads
+n_batch         = 2048     # best gen TPS in batch sweep (vs 512/1024)
+n_ubatch        = 512      # llama.cpp default physical micro-batch
+n_gpu_layers    = 0        # CPU-only (integrated GPU)
+flash_attn      = on       # ~15% gen TPS gain vs flash-attn off on Qwen2.5-3B
+mlock           = on       # keep weights resident; peak RSS still ~3.3 GB
+prio            = 1        # medium process priority under desktop UI
+cache_type_k/v  = f16      # fastest KV; q8_0 is a RAM tradeoff if needed
+OMP/OpenBLAS    = 4        # env caps so BLAS cannot oversubscribe CPUs
+temperature     = 0.7
+top_k           = 40
+top_p           = 0.95
+repeat_penalty  = 1.1
+max_tokens      = 512
 ```
 
-These parameters are ported from `ModelController.dart` in the Maathai mobile app, where they were tuned over thousands of production inference sessions.
+These parameters are ported from `ModelController.dart` in the Maathai mobile app (sampler) and refined for desktop via llama-bench sweeps on the competition GGUF.
 
 ### RAG over offline agricultural knowledge corpus
 
@@ -177,4 +185,10 @@ Seff  = (7168 − 3273.84) / 7168 × 100  = 54.3
 Sperf = min(8.03 / 15, 1.0) × 100      = 53.5
 ```
 
-**Notes for Gate 1 judges:** Peak RSS is safely under the 7168 MB hard limit. Throughput on this host is below the 15 t/s `Sperf=100` reference; we will re-run on ADTC-equivalent 4-vCPU hardware and continue OpenBLAS / thread / batch tuning before final Gate scoring. No thermal throttle was observed at `n_threads=4`.
+**Tuning follow-up (WSL llama-bench on same GGUF, `-p 512 -n 128`):**
+- Best app/server defaults: `-t 4 -b 2048 --flash-attn on --mlock` (see § Inference runtime)
+- Flash-attn on ≈ **9.4 t/s** vs ≈ **8.1 t/s** with flash-attn off (~15% gain on this host)
+- Batch 2048 beats 512/1024; threads >4 lower TPS (oversubscription on 4 logical CPUs)
+- Official Gate `Sperf` still comes from `adtc-profiler` / `llama-bench` defaults — re-run profiler after shipping these `llama-server` flags for app UX; profiler Sperf is independent of the Flutter wrapper
+
+**Notes for Gate 1 judges:** Peak RSS is safely under the 7168 MB hard limit. Throughput on this host is below the 15 t/s `Sperf=100` reference; we will re-run on ADTC-equivalent 4-vCPU hardware. No thermal throttle was observed at `n_threads=4`.

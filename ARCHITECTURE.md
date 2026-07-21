@@ -71,7 +71,7 @@ Maathai Desktop is a fully offline, on-device AI agricultural assistant for the 
 
 - Binary: `llama-server` from llama.cpp (must be on `PATH`)
 - Weights: GGUF Q4_K_M under `model/` (downloaded via `download_model.sh`, gitignored)
-- Config: `n_ctx=4096`, `n_threads=4`, `n_gpu_layers=0`
+- Config: `n_ctx=4096`, `n_threads=4`, `n_batch=2048`, `flash_attn=on`, `mlock`, `n_gpu_layers=0`
 
 ### 4. RAG Layer
 

@@ -11,12 +11,20 @@ class AppConfig {
   static const String llamaServerHost = 'localhost';
   static const String llamaServerUrl = 'http://$llamaServerHost:$llamaServerPort';
 
-  // Model defaults — aligned with llama.cpp / adtc-profiler llama-bench (-t 4, -p 512 -n 128)
+  // Model defaults — tuned via scripts/benchmark_*_wsl.sh against Qwen2.5-3B Q4_K_M
+  // ADTC profiler uses llama-bench -t 4 -p 512 -n 128; keep threads at 4 for eval parity.
   static const int defaultContextSize = 4096;
-  static const int defaultThreads = 4; // ADTC reference laptop: 4 vCPU; avoid HT oversubscription
-  static const int defaultBatchSize = 2048; // llama-server default; was 512 (under-batched)
-  static const int defaultUbatchSize = 512; // physical micro-batch (llama-server default)
+  static const int defaultThreads = 4; // ADTC 4 vCPU; >4 hurts TPS on this class of laptop
+  static const int defaultThreadsBatch = 4; // match prompt/batch processing to gen threads
+  static const int defaultBatchSize = 2048; // best TPS in sweep (512→6.6, 1024→7.5, 2048→8–9)
+  static const int defaultUbatchSize = 512; // llama.cpp physical micro-batch default
   static const int defaultGpuLayers = 0; // CPU-only for competition hardware
+  static const bool defaultFlashAttn = true; // +~15% gen TPS vs flash-attn off in WSL sweep
+  static const bool defaultMlock = true; // keep weights resident; peak RSS still ~3.3 GB ≪ 7 GB
+  static const int defaultProcessPrio = 1; // medium; improves scheduling under UI load
+  // KV cache: f16 is fastest here; q8_0 saves RAM (~same TPS). Keep f16 for Sperf.
+  static const String defaultCacheTypeK = 'f16';
+  static const String defaultCacheTypeV = 'f16';
 
   // Generation defaults
   static const double defaultTemperature = 0.7;
