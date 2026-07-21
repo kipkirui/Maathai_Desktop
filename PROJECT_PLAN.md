@@ -49,11 +49,11 @@ We are building a Flutter desktop application that delivers offline agricultural
 
 ---
 
-### Phase 2 — RAG Knowledge Base (Week 3–4) 🔄 IN PROGRESS
+### Phase 2 — RAG Knowledge Base (Week 3–4) ✅ COMPLETE
 **Target: Every response grounded in verified crop data**
 
 - [x] Design knowledge base schema (JSON document format)
-- [ ] Author knowledge base content (14 crops target — **~30 entries** across crops, pests, livestock, soil, markets, calendars)
+- [x] Author knowledge base content (~30+ bilingual entries across crops, pests, livestock, soil, markets, calendars)
 - [x] Implement `RagService` (pure Dart TF-IDF)
 - [x] Integrate RAG into `PromptService`
 - [x] Test RAG grounding (pytest `tests/test_rag.py`)
@@ -62,53 +62,29 @@ We are building a Flutter desktop application that delivers offline agricultural
 
 ---
 
-### Phase 3 — Desktop UI Polish (Week 4–5)
+### Phase 3 — Desktop UI Polish (Week 4–5) ✅ MOSTLY COMPLETE
 **Target: Production-quality UI that judges will evaluate for S_acc**
 
-- [ ] Desktop layout with persistent sidebar
-  - Navigation: Chat | Knowledge | Models | Settings
-  - Collapsible context panel (region, crop, season)
-- [ ] Chat screen improvements
-  - Streaming token display with cursor animation
-  - `<think>` tag parsing (CoT display in collapsible UI)
-  - Copy response button
-  - Thumbs up/down feedback (stored locally)
-  - "Regenerate" button
-  - Export conversation as Markdown/PDF
-- [ ] Context panel
-  - Set location (dropdown: county/region)
-  - Set active crop (from knowledge base crop list)
-  - Set season (long rains / short rains / dry)
-  - These values injected into every prompt
-- [ ] Knowledge base browser
-  - Browse by category (crops / pests / soil / markets)
-  - Full-text search
-  - Detail view with formatted content
-- [ ] Model status indicator in title bar (loading / ready / generating)
-- [ ] Keyboard shortcuts
-  - `Ctrl+Enter` — send message
-  - `Ctrl+N` — new chat
-  - `Ctrl+K` — focus search
-  - `Escape` — cancel generation
+- [x] Desktop layout with navigation rail (Chat | Knowledge | Models | Settings)
+- [x] Collapsible context panel (region, crop, season)
+- [x] Chat streaming, `<think>` collapse, copy, Markdown export
+- [ ] Thumbs up/down feedback; Regenerate; PDF export
+- [x] Knowledge base browser + model status indicator
+- [x] Ctrl+Enter send (expand remaining shortcuts)
 
 **Deliverable:** App feels polished, fast, and purpose-built. Non-technical user (extension officer) can use it without training.
 
 ---
 
-### Phase 4 — Swahili + African Alpha (Week 5–6)
+### Phase 4 — Swahili + African Alpha (Week 5–6) ✅ MOSTLY COMPLETE
 **Target: Full Swahili UI and response capability → +15% score bonus**
 
-- [ ] Extract all UI strings to `assets/i18n/en.json`
-- [ ] Translate all strings to `assets/i18n/sw.json`
-  - Use Qwen2.5-3B itself for draft translation (dogfooding), then manual review
-- [ ] Implement `TranslationController` with `Provider`
-- [ ] Language switcher in Settings (English / Kiswahili)
-- [ ] Swahili system prompt variant:
-  ```
-  Jibu kwa Kiswahili. Wewe ni mshauri wa kilimo kwa wakulima wadogo Afrika Mashariki...
-  ```
+- [x] Extract UI strings to `assets/i18n/en.json` / `sw.json`
+- [x] Implement `TranslationController` with `Provider`
+- [x] Language switcher in Settings (English / Kiswahili)
+- [x] Swahili system prompt variant / RAG `content_sw`
 - [ ] Test Swahili responses for agricultural terminology accuracy
-- [ ] Update `metadata.json`: `"language_scope": ["en", "sw"]`, `"african_alpha_claim": true`
+- [x] Update `metadata.json`: `"language_scope": ["en", "sw"]`, `"african_alpha_claim": true`
 
 **Deliverable:** Full app experience in Swahili. All agricultural responses in Swahili when language set to sw.
 
@@ -147,13 +123,14 @@ We are building a Flutter desktop application that delivers offline agricultural
 ### Phase 6 — Gate 1 Submission (August 25, 2026) 🎯
 **Checklist before DevPost submit:**
 
-- [ ] `metadata.json` — no placeholder values remain
+- [x] `metadata.json` — no placeholder values remain
 - [ ] `download_model.sh` — tested from scratch on Ubuntu 22.04
-- [ ] `REPORT.md` — complete, accurate benchmark numbers
-- [ ] README — clear build instructions
+- [x] `REPORT.md` — complete, accurate benchmark numbers (participant laptop)
+- [x] `LICENSE` — GNU GPL v3 present
+- [x] README — clear build instructions
 - [ ] Repo is public
 - [ ] `*.gguf` files are NOT in git history
-- [ ] `adtc-profiler run --mode participant` → `"status": "pass"`
+- [ ] `adtc-profiler run --mode participant` → accuracy scored; improve TPS if needed
 - [ ] 2-minute demo video uploaded
 - [ ] DevPost submission form completed
 

@@ -208,8 +208,8 @@ Maathai_Desktop/
 ├── assets/
 │   ├── knowledge_base/        ← Agricultural corpus (also used by Flutter)
 │   └── i18n/
-│       ├── en.json            ← Ported from mobile app
-│       └── sw.json            ← Ported from mobile app (1314 keys)
+│       ├── en.json            ← Desktop UI strings (EN)
+│       └── sw.json            ← Desktop UI strings (Kiswahili)
 │
 └── tests/                     ← pytest test suite
     ├── conftest.py
@@ -253,14 +253,15 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 ## Competition Checklist
 
 - [ ] Repository is public on GitHub
-- [ ] `metadata.json` — no placeholder values
-- [ ] `download_model.sh` — works from fresh clone, idempotent
-- [ ] Model is GGUF format, hosted publicly on HuggingFace
-- [ ] `model/*.gguf` excluded from git
-- [ ] `REPORT.md` — complete technical writeup
-- [ ] `adtc-profiler run --mode participant` → `submission.json` passes
-- [ ] Peak RAM < 7168 MB (hard limit)
-- [ ] Zero network calls during inference
+- [x] `metadata.json` — no placeholder values
+- [ ] `download_model.sh` — works from fresh clone, idempotent (verify on clean Ubuntu 22.04)
+- [x] Model is GGUF format, hosted publicly on HuggingFace
+- [x] `model/*.gguf` excluded from git
+- [x] `REPORT.md` — complete technical writeup (participant benchmarks filled)
+- [x] `LICENSE` — GNU GPL v3
+- [ ] `adtc-profiler run --mode participant` → re-run with accuracy scoring before Gate 1
+- [x] Peak RAM < 7168 MB (hard limit) — measured ~3274 MB
+- [ ] Zero network calls during inference (verify offline)
 - [ ] 2-minute demo video recorded
 - [ ] Submitted on DevPost before August 25
 

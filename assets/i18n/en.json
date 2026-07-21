@@ -16,6 +16,10 @@
   "send": "Send",
   "stop": "Stop",
   "clear_chat": "Clear chat",
+  "new_chat": "New chat",
+  "export_markdown": "Export as Markdown",
+  "copy": "Copy",
+  "regenerate": "Regenerate",
 
   "context_panel_title": "Farm Context",
   "context_panel_subtitle": "Set your location & crop for tailored advice",
@@ -23,15 +27,26 @@
   "context_crop": "Active Crop",
   "context_season": "Season",
   "clear_context": "Clear Context",
+  "select_hint": "Select...",
+  "none": "None",
 
   "search_knowledge": "Search knowledge base…",
   "knowledge_select_hint": "Select an article from the list",
   "no_results": "No results found",
+  "category_crops": "Crops",
+  "category_pests": "Pests",
+  "category_soil": "Soil",
+  "category_markets": "Markets",
+  "category_calendars": "Calendars",
+  "category_livestock": "Livestock",
+  "category_all": "All",
 
   "import_model": "Import GGUF",
   "no_models_title": "No models found",
   "no_models_subtitle": "Run download_model.sh to download the competition model,\nor import a GGUF file from your computer.",
   "load_model": "Go to Models",
+  "load": "Load",
+  "unload": "Unload",
   "retry": "Retry",
 
   "no_model_loaded_banner": "No model loaded — go to Models to load a GGUF file",
@@ -39,6 +54,8 @@
   "model_error_banner": "Model error — check Models tab",
   "model_import_copying": "Copying {file}… {percent}%",
   "model_import_loading": "Loading {file} into llama-server…",
+  "model_ready": "Model ready",
+  "model_generating": "Generating…",
 
   "settings_language": "Language",
   "settings_appearance": "Appearance",
@@ -52,5 +69,21 @@
   "temperature": "Temperature",
   "top_p": "Top-P",
   "max_tokens": "Max tokens",
-  "threads": "CPU threads"
+  "threads": "CPU threads",
+
+  "chip_agriculture": "Agriculture domain",
+  "chip_offline_rag": "Offline RAG",
+  "chip_swahili": "Swahili support",
+  "chip_llamacpp": "llama.cpp",
+
+  "sources": "Sources",
+  "sources_used": "Knowledge sources used:",
+  "view_sources": "View sources",
+  "thinking": "Thinking...",
+  "you": "You",
+  "assistant_name": "Maathai AI",
+  "category_pests_diseases": "Pests & Diseases",
+  "offline": "Offline",
+  "language_english": "English",
+  "language_swahili": "Kiswahili"
 }

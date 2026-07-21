@@ -41,13 +41,13 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
   bool _loading = true;
 
   static const _categories = [
-    {'key': 'all', 'label': 'All', 'icon': Icons.apps},
-    {'key': 'crops', 'label': 'Crops', 'icon': Icons.grass},
-    {'key': 'pests', 'label': 'Pests & Diseases', 'icon': Icons.bug_report_outlined},
-    {'key': 'soil', 'label': 'Soil', 'icon': Icons.terrain_outlined},
-    {'key': 'markets', 'label': 'Markets', 'icon': Icons.store_outlined},
-    {'key': 'calendars', 'label': 'Calendars', 'icon': Icons.calendar_month_outlined},
-    {'key': 'livestock', 'label': 'Livestock', 'icon': Icons.pets_outlined},
+    {'key': 'all', 'labelKey': 'category_all', 'icon': Icons.apps},
+    {'key': 'crops', 'labelKey': 'category_crops', 'icon': Icons.grass},
+    {'key': 'pests', 'labelKey': 'category_pests_diseases', 'icon': Icons.bug_report_outlined},
+    {'key': 'soil', 'labelKey': 'category_soil', 'icon': Icons.terrain_outlined},
+    {'key': 'markets', 'labelKey': 'category_markets', 'icon': Icons.store_outlined},
+    {'key': 'calendars', 'labelKey': 'category_calendars', 'icon': Icons.calendar_month_outlined},
+    {'key': 'livestock', 'labelKey': 'category_livestock', 'icon': Icons.pets_outlined},
   ];
 
   @override
@@ -151,7 +151,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                       return Padding(
                         padding: const EdgeInsets.only(right: 6),
                         child: FilterChip(
-                          label: Text(cat['label'] as String),
+                          label: Text(t.t(cat['labelKey'] as String)),
                           selected: active,
                           onSelected: (_) {
                             setState(() => _activeCategory = cat['key'] as String);

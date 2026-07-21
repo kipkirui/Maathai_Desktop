@@ -1,8 +1,8 @@
 # Technical Report — Maathai Desktop
 
-**Team ID:** [TO BE FILLED — register at adtc-2026.devpost.com]  
+**Team ID:** 1060310  
 **Domain:** agriculture  
-**Model:** [TO BE FILLED after model selection in Phase 1]  
+**Model:** Qwen2.5-3B-Instruct-Q4_K_M  
 **Quantization:** GGUF Q4_K_M
 
 ---
@@ -33,7 +33,7 @@ Maathai Desktop addresses all three by running a tuned agricultural AI advisor e
 - **No API fees** — inference is free after model download
 - **Works during load-shedding and data rationing** — inference requires no active connection
 - **Privacy** — farm data (crop records, scan results) never leave the device
-- **Latency** — no round-trip to a cloud server; responses start within 400ms
+- **Latency** — no round-trip to a cloud server once the model is loaded
 
 ### Prior work — Maathai mobile app
 
@@ -51,18 +51,18 @@ Candidates evaluated:
 
 | Model | Params | GGUF Q4_K_M | Est. RAM | Est. TPS (i5 12th gen) | Verdict |
 |---|---|---|---|---|---|
-| **Qwen2.5-3B-Instruct** | 3B | ~1.86 GB | ~2.5 GB | 22–28 t/s | ✅ Selected |
+| **Qwen2.5-3B-Instruct** | 3B | ~1.86 GB | ~2.5–3.3 GB | 8–28 t/s (machine-dependent) | ✅ Selected |
 | Phi-3.5 Mini Instruct | 3.8B | ~2.4 GB | ~3.1 GB | 18–24 t/s | Good, larger |
 | Llama 3.2 3B Instruct | 3B | ~2.0 GB | ~2.6 GB | 20–26 t/s | Similar, less instruction-tuned |
 
 Decision rationale:
 - Qwen2.5-3B-Instruct delivers consistently strong instruction-following quality at 3B scale
 - ChatML format (`<|im_start|>` / `<|im_end|>`) is natively supported — our prompt builder targets this format
-- At 22–28 TPS on an i5 12th gen, it comfortably exceeds the 15 TPS reference → `Sperf = 100`
-- At ~2.5 GB peak RAM, `Seff = (7 − 2.5) / 7 × 100 = 64.3` — strong efficiency score
+- Peak RAM stays well under the 7 GB hard ceiling (~3.3 GB measured) → strong `Seff`
 - Qwen2.5 training data has meaningful Swahili representation, improving Swahili response quality
+- Throughput depends on host CPU; on our participant laptop (i7-1185G7, Ubuntu 22.04) we measure ~8 t/s generation. On ADTC-class i5 hardware with OpenBLAS-tuned `llama.cpp`, we expect higher TPS; the 3B Q4_K_M choice remains the best accuracy/RAM/speed tradeoff versus 7B alternatives
 
-We deliberately avoided 7B models. A 7B model at Q4_K_M uses ~5.5 GB RAM, giving `Seff = 21.4` vs our `64.3` — a 43-point gap in the efficiency component. Speed at 7B (~10 TPS) gives `Sperf = 67` vs our `100`. The combined handicap of a 7B model cannot be compensated by marginally better raw accuracy, especially with our RAG layer closing the domain accuracy gap.
+We deliberately avoided 7B models. A 7B model at Q4_K_M uses ~5.5 GB RAM, giving `Seff ≈ 21` vs our measured `Seff ≈ 54` — a large efficiency gap. A slower 7B also risks thermal penalties on 4-vCPU integrated-GPU laptops. The RAG layer closes much of the domain accuracy gap without the RAM cost of a larger base model.
 
 ### Quantization format
 
@@ -74,7 +74,7 @@ GGUF Q4_K_M was selected for the following reasons, consistent with our mobile a
 
 ### Inference runtime
 
-`llama.cpp` via the `llama-cpp-python` FFI binding is the only permitted runtime. Key configuration for the ADTC standard laptop:
+`llama.cpp` via `llama-server` (HTTP/SSE on localhost) is the only permitted runtime. Key configuration for the ADTC standard laptop:
 
 ```
 n_ctx      = 4096     # sufficient for RAG context + prompt
@@ -100,7 +100,7 @@ Implementation:
 - **Algorithm:** TF-IDF with cosine similarity, English stemmer, IDF weighting
 - **Speed:** < 5ms retrieval over all documents (in-memory, pure Dart)
 - **Language:** Bilingual — returns Swahili content when language = "sw"
-- **Knowledge base:** Bundled as Flutter assets (JSON), covering crops, pests, soil, markets, calendars
+- **Knowledge base:** Bundled as Flutter assets (JSON), covering crops, pests, soil, markets, calendars, livestock (~30 documents)
 - **No external dependencies:** No Python, no server process, no embedding model to download
 
 Key knowledge base entries (all bilingual):
@@ -108,13 +108,17 @@ Key knowledge base entries (all bilingual):
 - Maize nutrient deficiency diagnosis: N/P/K/Zn symptoms and treatments with CAN/DAP rates
 - Fall Armyworm management: identification, scouting thresholds, Bt and chemical control
 - Maize Lethal Necrosis: differential diagnosis vs nitrogen deficiency, notifiable disease guidance
-- [Additional: soil management, markets, planting calendars — in progress]
+- Tomato commercial guide: East African hybrids, nursery-to-harvest schedule, irrigation
+- Tomato diseases: late blight, bacterial wilt, TYLCV prevention
+- Soil management: East African soil types including red volcanic (Arusha/Kilimanjaro)
+- Markets: maize, beans, tomato price bands for Kenya/Tanzania/Uganda
+- Planting calendars: long rains (Masika) and short rains (Vuli) by zone
 
 The RAG is **load-bearing**: on tp_001 (maize yellowing/nitrogen deficiency), retrieval surfaces the exact passage "Apply CAN at 50 kg/ha immediately" from the knowledge base — specificity that a 3B model would not reliably produce from training data alone.
 
 ### Swahili language support
 
-The Maathai mobile app ships with 14 UI locales including full Swahili (`sw`) with 1314 translated strings. This is ported directly to Maathai Desktop. When a Swahili query is detected (or the user switches language), the system prompt adds `"Jibu kwa Kiswahili"` and uses Swahili UI strings.
+The desktop UI is bilingual English ↔ Kiswahili via `assets/i18n/{en,sw}.json` and `TranslationController`. When the user switches language (or a Swahili query is detected), the system prompt adds `"Jibu kwa Kiswahili"` and RAG returns `content_sw` passages. Knowledge-base documents are authored with both `content` and `content_sw`.
 
 This qualifies for the African Alpha Bonus (+15% on panel score).
 
@@ -127,7 +131,7 @@ This qualifies for the African Alpha Bonus (+15% on panel score).
 - **`PromptService`** — assembles ChatML prompts within the 4096-token context budget (25% system / 30% RAG / 35% history / remaining user).
 - **`ModelController`** — manages model lifecycle, sampler params (ported from Maathai mobile app).
 
-Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise (production Maathai Android app) and large amounts of existing Dart code are directly reusable. Flutter Linux desktop adds ~50 MB overhead — negligible compared to the model's 2.5 GB.
+Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise (production Maathai Android app) and large amounts of existing Dart code are directly reusable. Flutter Linux desktop adds ~50 MB overhead — negligible compared to the model's footprint.
 
 ---
 
@@ -154,25 +158,23 @@ Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise
 
 ## Benchmarks
 
-*Self-reported development benchmarks. Official scores are measured by the ADTC profiler on the standard evaluation machine.*
+*Self-reported development benchmarks from `adtc-profiler` participant mode. Official scores are measured by the ADTC profiler on the standard evaluation machine.*
 
 | Metric | Value | Notes |
 |---|---|---|
-| **Development machine** | [TO BE FILLED] | e.g. "Windows 11, Intel i7 12th gen, 16 GB RAM" |
-| **Model** | [TO BE FILLED] | e.g. "Qwen2.5-3B-Instruct-Q4_K_M.gguf" |
-| **Peak RAM** | [TO BE FILLED] MB | Measured by adtc-profiler |
-| **Steady-state RAM** | [TO BE FILLED] MB | After 5-minute warmup |
-| **Time to first token** | [TO BE FILLED] ms | Cold start on test prompt |
-| **Generation speed** | [TO BE FILLED] t/s | Measured over 128-token burst |
-| **Thermal throttling** | None observed | During 10-minute sustained test |
-| **Profiler verdict** | pass | `adtc-profiler compare submission.json` |
+| **Development machine** | Ubuntu 22.04.5 LTS, 11th Gen Intel Core i7-1185G7 @ 3.00 GHz, 11.7 GB RAM, no discrete GPU | Participant laptop run |
+| **Model** | `qwen2.5-3b-instruct-q4_k_m.gguf` | Qwen2.5-3B-Instruct Q4_K_M |
+| **Peak RAM** | 3273.84 MB | Measured by adtc-profiler (`memory.peak_rss_mb`) |
+| **Steady-state RAM** | 3149.29 MB | `memory.steady_state_rss_mb` |
+| **Time to first token** | 18416.73 ms | Cold start on 512-token prompt (includes model/context warm path) |
+| **Generation speed** | 8.03 t/s | Measured over 128-token burst |
+| **Thermal throttling** | None observed | `cpu_thermal.throttled: false`; CPU p99 ≈ 52% |
+| **Profiler mode** | participant | Accuracy suite not yet scored in this file (`accuracy: []`) |
 
-**Estimated competition scores (to be updated with real numbers):**
+**Estimated competition scores (from participant laptop numbers):**
 ```
-Seff  = (7168 − peak_rss_mb) / 7168 × 100  = [XX.X]
-Sperf = min(tps / 15, 1.0) × 100           = [XX.X]
+Seff  = (7168 − 3273.84) / 7168 × 100  = 54.3
+Sperf = min(8.03 / 15, 1.0) × 100      = 53.5
 ```
 
----
-
-*This report will be completed with actual benchmark numbers from Phase 1 of the project plan (target: July 7, 2026).*
+**Notes for Gate 1 judges:** Peak RSS is safely under the 7168 MB hard limit. Throughput on this host is below the 15 t/s `Sperf=100` reference; we will re-run on ADTC-equivalent 4-vCPU hardware and continue OpenBLAS / thread / batch tuning before final Gate scoring. No thermal throttle was observed at `n_threads=4`.

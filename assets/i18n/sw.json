@@ -16,6 +16,10 @@
   "send": "Tuma",
   "stop": "Simama",
   "clear_chat": "Futa mazungumzo",
+  "new_chat": "Mazungumzo mapya",
+  "export_markdown": "Hamisha kama Markdown",
+  "copy": "Nakili",
+  "regenerate": "Tengeneza upya",
 
   "context_panel_title": "Muktadha wa Shamba",
   "context_panel_subtitle": "Weka eneo na zao lako kwa ushauri maalum",
@@ -23,15 +27,26 @@
   "context_crop": "Zao la Sasa",
   "context_season": "Msimu",
   "clear_context": "Futa Muktadha",
+  "select_hint": "Chagua...",
+  "none": "Hakuna",
 
   "search_knowledge": "Tafuta maarifa…",
   "knowledge_select_hint": "Chagua makala kutoka kwenye orodha",
   "no_results": "Hakuna matokeo",
+  "category_crops": "Mazao",
+  "category_pests": "Wadudu",
+  "category_soil": "Udongo",
+  "category_markets": "Masoko",
+  "category_calendars": "Kalenda",
+  "category_livestock": "Mifugo",
+  "category_all": "Zote",
 
   "import_model": "Ingiza GGUF",
   "no_models_title": "Hakuna mifano iliyopatikana",
   "no_models_subtitle": "Endesha download_model.sh kupakua mfano wa mashindano,\nau ingiza faili la GGUF kutoka kwa kompyuta yako.",
   "load_model": "Nenda kwa Mifano",
+  "load": "Pakia",
+  "unload": "Ondoa",
   "retry": "Jaribu tena",
 
   "no_model_loaded_banner": "Hakuna mfano uliopakiwa — nenda kwa Mifano kupakia faili la GGUF",
@@ -39,6 +54,8 @@
   "model_error_banner": "Hitilafu ya mfano — angalia kichupo cha Mifano",
   "model_import_copying": "Inakopi {file}… {percent}%",
   "model_import_loading": "Inapakia {file} kwenye llama-server…",
+  "model_ready": "Mfano uko tayari",
+  "model_generating": "Inatengeneza…",
 
   "settings_language": "Lugha",
   "settings_appearance": "Mwonekano",
@@ -52,5 +69,21 @@
   "temperature": "Joto (Temperature)",
   "top_p": "Top-P",
   "max_tokens": "Maneno ya juu",
-  "threads": "Nyuzi za CPU"
+  "threads": "Nyuzi za CPU",
+
+  "chip_agriculture": "Sekta ya kilimo",
+  "chip_offline_rag": "RAG bila mtandao",
+  "chip_swahili": "Kiswahili",
+  "chip_llamacpp": "llama.cpp",
+
+  "sources": "Vyanzo",
+  "sources_used": "Vyanzo vya maarifa vilivyotumika:",
+  "view_sources": "Angalia vyanzo",
+  "thinking": "Inafikiri...",
+  "you": "Wewe",
+  "assistant_name": "Maathai AI",
+  "category_pests_diseases": "Wadudu na Magonjwa",
+  "offline": "Bila mtandao",
+  "language_english": "Kiingereza",
+  "language_swahili": "Kiswahili"
 }

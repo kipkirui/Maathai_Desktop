@@ -158,6 +158,7 @@ class _ModelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.watch<TranslationController>();
     final isCompetition = model.isDefaultCompetitionModel;
 
     return Card(
@@ -242,7 +243,7 @@ class _ModelCard extends StatelessWidget {
             if (isLoaded)
               OutlinedButton(
                 onPressed: onUnload,
-                child: const Text('Unload'),
+                child: Text(t.t('unload')),
               )
             else
               FilledButton(
@@ -253,7 +254,7 @@ class _ModelCard extends StatelessWidget {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Load'),
+                    : Text(t.t('load')),
               ),
           ],
         ),

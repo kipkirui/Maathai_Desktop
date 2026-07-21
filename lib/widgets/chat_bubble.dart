@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:provider/provider.dart';
 
 import '../state/chat_controller.dart';
+import '../state/translation_controller.dart';
 import '../utils/platform_ui.dart';
 import 'typing_indicator.dart';
 
@@ -24,6 +26,7 @@ class _ChatBubbleState extends State<ChatBubble> {
     final msg = widget.message;
     final isUser = msg.role == MessageRole.user;
     final theme = Theme.of(context);
+    final t = context.watch<TranslationController>();
 
     return Padding(
       padding: EdgeInsets.only(
@@ -40,7 +43,7 @@ class _ChatBubbleState extends State<ChatBubble> {
           Padding(
             padding: const EdgeInsets.only(bottom: 4, left: 4, right: 4),
             child: Text(
-              isUser ? 'You' : 'Maathai AI',
+              isUser ? t.t('you') : t.t('assistant_name'),
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
@@ -66,7 +69,7 @@ class _ChatBubbleState extends State<ChatBubble> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: isUser
                 ? Text(msg.content)
-                : _buildAssistantContent(msg, theme),
+                : _buildAssistantContent(msg, theme, t),
           ),
           // Action row (assistant only)
           if (!isUser && !msg.isStreaming)
@@ -76,7 +79,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                 children: [
                   _ActionButton(
                     icon: Icons.copy_outlined,
-                    tooltip: 'Copy',
+                    tooltip: t.t('copy'),
                     onTap: () =>
                         Clipboard.setData(ClipboardData(text: msg.content)),
                   ),
@@ -84,7 +87,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                     const SizedBox(width: 4),
                     _ActionButton(
                       icon: Icons.info_outline,
-                      tooltip: 'View sources',
+                      tooltip: t.t('view_sources'),
                       onTap: () =>
                           setState(() => _showRagSources = !_showRagSources),
                     ),
@@ -100,7 +103,11 @@ class _ChatBubbleState extends State<ChatBubble> {
     );
   }
 
-  Widget _buildAssistantContent(ChatMessage msg, ThemeData theme) {
+  Widget _buildAssistantContent(
+    ChatMessage msg,
+    ThemeData theme,
+    TranslationController t,
+  ) {
     if (msg.isStreaming) {
       if (msg.content.isEmpty) {
         return const TypingIndicator();
@@ -138,7 +145,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Thinking...',
+                  t.t('thinking'),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
@@ -217,6 +224,7 @@ class _RagSourcesPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.watch<TranslationController>();
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.all(12),
@@ -231,7 +239,7 @@ class _RagSourcesPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Knowledge sources used:',
+            t.t('sources_used'),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),

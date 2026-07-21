@@ -205,6 +205,7 @@ class _DropdownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.watch<TranslationController>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: DropdownButtonFormField<String>(
@@ -215,10 +216,10 @@ class _DropdownField extends StatelessWidget {
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
-        hint: const Text('Select...'),
+        hint: Text(t.t('select_hint')),
         isExpanded: true,
         items: [
-          const DropdownMenuItem(value: null, child: Text('None')),
+          DropdownMenuItem(value: null, child: Text(t.t('none'))),
           ...items.map((item) => DropdownMenuItem(
                 value: item,
                 child: Text(item, overflow: TextOverflow.ellipsis),

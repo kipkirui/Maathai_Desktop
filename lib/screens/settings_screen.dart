@@ -233,14 +233,19 @@ class _AboutSection extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 12),
-            const Wrap(
-              spacing: 8,
-              children: [
-                Chip(label: Text('Agriculture domain')),
-                Chip(label: Text('Offline RAG')),
-                Chip(label: Text('Swahili support')),
-                Chip(label: Text('llama.cpp')),
-              ],
+            Builder(
+              builder: (context) {
+                final t = context.watch<TranslationController>();
+                return Wrap(
+                  spacing: 8,
+                  children: [
+                    Chip(label: Text(t.t('chip_agriculture'))),
+                    Chip(label: Text(t.t('chip_offline_rag'))),
+                    Chip(label: Text(t.t('chip_swahili'))),
+                    Chip(label: Text(t.t('chip_llamacpp'))),
+                  ],
+                );
+              },
             ),
           ],
         ),
