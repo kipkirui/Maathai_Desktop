@@ -93,15 +93,25 @@ if [[ ! -x "$LLAMA_DIR/llama-bench" ]]; then
 fi
 
 if [[ ! -x "$VENV/bin/adtc-profiler" ]]; then
-  echo "→ Installing adtc-profiler in .venv-wsl..."
+  echo "→ Installing adtc-profiler in .venv-wsl (Python 3.11)..."
   "$PYTHON" -m venv "$VENV"
-  # shellcheck disable=SC1091
-  source "$VENV/bin/activate"
-  pip install -q --upgrade pip
-  pip install -q "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
-else
-  echo "→ adtc-profiler already installed in .venv-wsl"
 fi
+
+# Always use python3.11 inside the venv when present (avoid mixed 3.10/3.11 site-packages)
+if [[ -x "$VENV/bin/python3.11" ]]; then
+  VPY="$VENV/bin/python3.11"
+else
+  VPY="$VENV/bin/python"
+fi
+
+echo "→ Ensuring adtc-profiler + lm-eval on $($VPY -V)"
+"$VPY" -m pip install -q --upgrade pip
+"$VPY" -m pip install -q "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
+if ! "$VPY" -c "import lm_eval" >/dev/null 2>&1; then
+  echo "FAIL: lm_eval still missing after install"
+  exit 1
+fi
+echo "✓ lm_eval import OK"
 
 if [[ $INSTALL_ONLY -eq 1 ]]; then
   echo ""

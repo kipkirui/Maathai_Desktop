@@ -136,9 +136,20 @@ VENV="$REPO_ROOT/.venv-wsl"
 if [[ -x "$LLAMA_DIR/llama-bench" ]]; then
   export PATH="$LLAMA_DIR:$PATH"
 fi
-if [[ -x "$VENV/bin/adtc-profiler" ]]; then
+# Prefer Python 3.11 entrypoints — mixed 3.10/3.11 venvs put lm_eval only on 3.11
+ADTC_BIN=""
+if [[ -x "$VENV/bin/python3.11" && -x "$VENV/bin/adtc-profiler" ]]; then
+  export PATH="$VENV/bin:$PATH"
+  ADTC_BIN="$VENV/bin/adtc-profiler"
+  # Verify accuracy import on the same interpreter adtc-profiler uses
+  if ! "$VENV/bin/python3.11" -c "import lm_eval" >/dev/null 2>&1; then
+    echo "⚠ lm_eval missing for python3.11 — installing accuracy stack..."
+    "$VENV/bin/python3.11" -m pip install -q "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
+  fi
+elif [[ -x "$VENV/bin/adtc-profiler" ]]; then
   # shellcheck disable=SC1091
   source "$VENV/bin/activate"
+  ADTC_BIN="$(command -v adtc-profiler)"
 fi
 
 if ! command -v llama-bench >/dev/null 2>&1; then
@@ -148,31 +159,39 @@ if ! command -v llama-bench >/dev/null 2>&1; then
     echo "→ running scripts/wsl_profiler_setup.sh --install-only"
     sed -i 's/\r$//' "$SCRIPT_DIR/wsl_profiler_setup.sh" 2>/dev/null || true
     bash "$SCRIPT_DIR/wsl_profiler_setup.sh" --install-only
-    export PATH="$LLAMA_DIR:$PATH"
-    # shellcheck disable=SC1091
-    source "$VENV/bin/activate"
+    export PATH="$LLAMA_DIR:$VENV/bin:$PATH"
+    ADTC_BIN="$VENV/bin/adtc-profiler"
   else
     echo "Install llama.cpp (llama-bench) and adtc-profiler, then re-run."
     exit 1
   fi
 fi
 
-if ! command -v adtc-profiler >/dev/null 2>&1; then
-  echo "adtc-profiler not found. Install:"
-  echo '  python3.11 -m pip install "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"'
-  exit 1
+if [[ -z "$ADTC_BIN" ]] || [[ ! -x "$ADTC_BIN" ]]; then
+  if command -v adtc-profiler >/dev/null 2>&1; then
+    ADTC_BIN="$(command -v adtc-profiler)"
+  else
+    echo "adtc-profiler not found. Install:"
+    echo '  python3.11 -m pip install "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"'
+    exit 1
+  fi
 fi
 
 echo "✓ llama-bench : $(command -v llama-bench)"
-echo "✓ adtc-profiler: $(command -v adtc-profiler)"
+echo "✓ adtc-profiler: $ADTC_BIN"
+if "$VENV/bin/python3.11" -c "import lm_eval" >/dev/null 2>&1; then
+  echo "✓ lm_eval     : available (python3.11)"
+else
+  echo "⚠ lm_eval     : missing — accuracy may be empty"
+fi
 
 export OMP_NUM_THREADS=4
 export OPENBLAS_NUM_THREADS=4
 export MKL_NUM_THREADS=4
 
-PROFILER_CMD=(adtc-profiler run)
+PROFILER_CMD=("$ADTC_BIN" run)
 if command -v taskset >/dev/null 2>&1; then
-  PROFILER_CMD=(taskset -c 0-3 adtc-profiler run)
+  PROFILER_CMD=(taskset -c 0-3 "$ADTC_BIN" run)
 fi
 
 echo ""
