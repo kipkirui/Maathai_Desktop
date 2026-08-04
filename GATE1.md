@@ -29,8 +29,8 @@ After a full run:
 3. Copy TPS / RAM / TTFT into `REPORT.md` § Benchmarks
 4. Keep `submission.json` locally (gitignored) for DevPost / judges
 
-**Accuracy note:** current `lm_eval` `gguf` backend talks HTTP (`/v1/completions`).  
-`gate1_verify.sh` (full mode) patches `adtc-profiler`’s `base_url=local` → `http://127.0.0.1:8080` and starts `llama-server` for the accuracy stage.
+**Accuracy note:** stock `lm_eval --model gguf` + current `llama-server` cannot do ARC loglikelihood (OpenAI logprobs are completion-only).  
+`gate1_verify.sh` (full mode) patches `adtc-profiler` to call `scripts/run_maathai_accuracy.py`, which scores via **llama-cpp-python** echo logprobs.
 
 ---
 
