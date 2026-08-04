@@ -90,33 +90,29 @@ We are building a Flutter desktop application that delivers offline agricultural
 
 ---
 
-### Phase 5 — Testing & Competition Hardening (Week 6–7)
-**Target: Pass all profiler checks, no thermal penalty, reproducible**
+### Phase 5 — Testing & Competition Hardening 🔄 IN PROGRESS (as of August 4, 2026)
+**Target: Pass all profiler checks, no thermal penalty, reproducible — 21 days to Gate 1**
 
-- [ ] Performance profiling on target hardware (or equivalent VM)
-  - Run `adtc-profiler run --mode participant`
-  - Verify: peak RSS < 7 GB
-  - Verify: TPS > 8 (target ≥ 12)
-  - Verify: no thermal throttling at 4 threads
-- [ ] RAM optimization
-  - Context window: 4096 (cap via `--ctx-size 4096`)
-  - Batch size: 512
-  - Threads: 4 (via `--threads 4`)
-  - No GPU layers (`--n-gpu-layers 0`)
+**Latest rules notes (DevPost + challenge site, Aug 2026):**
+- `Sperf = 100 × (TPSact ÷ TPSmax)` on the leaderboard; profiler still lists 15 t/s as a provisional local reference
+- Hardware profile explicitly includes AMD Ryzen 5 3000–5000 as well as Intel i5
+- Final participant report should include accuracy (do not ship `--skip-accuracy` as the Gate 1 artifact)
+- Timeline: Gate 1 Aug 25 → semifinalists Sep 8 → semifinal package Sep 22 → finalists Sep 29 → live defense Oct 17
+
+- [x] Initial participant profiling (`submission.json` 2026-06-24)
+  - peak RSS ~3274 MB (< 7 GB) ✅
+  - TPS 8.03 (below provisional 15; competitive TPSmax risk) 🔄
+  - no thermal throttling at 4 threads ✅
+  - `accuracy: []` — must re-run full suite ❌
+- [x] RAM / runtime tuning documented (`n_ctx=4096`, `n_batch=2048`, `threads=4`, flash-attn on, `n_gpu_layers=0`)
+- [ ] Re-run profiler after shipping tuned flags; prefer ADTC-class 4-vCPU Ubuntu
 - [ ] Test `download_model.sh` on fresh Ubuntu 22.04 VM (no prior downloads)
-- [ ] Verify all prompts in `metadata.json` produce correct responses
-- [ ] Integration tests:
-  - App starts without llama-server on PATH → shows clear error + install instructions
-  - Model file missing → prompts user to run `download_model.sh`
-  - Out of memory → graceful error message (no crash)
-- [ ] Unit tests:
-  - `RagService.retrieve()` returns relevant docs for agricultural queries
-  - `PromptService.build()` stays within token budget
-  - `LlmService` streaming parses SSE correctly
+- [ ] Verify both `metadata.json` test prompts produce grounded responses (RAG + model)
+- [x] Unit tests exist for RAG / prompts / submission metadata
 - [ ] Record 2-minute demo video for Gate 1 submission
-  - Show: app startup, model loading, agriculture Q&A in English, switch to Swahili, knowledge base browser, context panel
+  - Show: app startup, model loading, agriculture Q&A in English, switch to Swahili, knowledge base browser, offline
 
-**Deliverable:** `adtc-profiler` produces `"status": "pass"`. Video recorded. Repo public.
+**Deliverable:** Full `submission.json` with accuracy metrics. Video recorded. Repo public.
 
 ---
 
@@ -125,11 +121,11 @@ We are building a Flutter desktop application that delivers offline agricultural
 
 - [x] `metadata.json` — no placeholder values remain
 - [ ] `download_model.sh` — tested from scratch on Ubuntu 22.04
-- [x] `REPORT.md` — complete, accurate benchmark numbers (participant laptop)
+- [x] `REPORT.md` — complete, accurate benchmark numbers (participant laptop; refresh after re-profile)
 - [x] `LICENSE` — GNU GPL v3 present
 - [x] README — clear build instructions
 - [ ] Repo is public
-- [ ] `*.gguf` files are NOT in git history
+- [x] `*.gguf` excluded from git (local weights present under `model/` for dev)
 - [ ] `adtc-profiler run --mode participant` → accuracy scored; improve TPS if needed
 - [ ] 2-minute demo video uploaded
 - [ ] DevPost submission form completed

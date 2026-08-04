@@ -3,9 +3,9 @@
 > **See also:** [`PROJECT_PLAN.md`](PROJECT_PLAN.md) — the original project plan with phase checklists, technical decision log, team roles, and risk register. This document (`PLAN.md`) focuses on the competitive strategy, scoring analysis, and a phase-by-phase breakdown informed by the competition rules.
 
 **Competition:** Africa Deep Tech Challenge 2026  
-**Gate 1 Deadline:** August 25, 2026  
-**Today:** June 23, 2026  
-**Days available:** 63 days (with 1-week buffer, work ends August 18)
+**Gate 1 Deadline:** August 25, 2026 (DevPost: Aug 24, 2026 @ 11:45pm PDT)  
+**Today:** August 4, 2026  
+**Days remaining:** **21 days** to Gate 1 (buffer target still August 18)
 
 ---
 
@@ -56,15 +56,18 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 
 ### Sperf (Speed, 30%)
 
-`Sperf = min(TPS / 15, 1.0) × 100`
+**Official DevPost / challenge site (current):**
+`Sperf = 100 × (TPSact ÷ TPSmax)` — relative to the fastest qualified submission on audit hardware.
 
-Scoring is normalized to a 15 TPS reference. Hitting ≥15 TPS means `Sperf = 100`.
+**adtc-profiler / local estimate (still published):**
+`Sperf ≈ min(TPS / 15, 1.0) × 100` with `TPS_REFERENCE = 15.0` marked **provisional**.
 
-- A 3B model on an i5 12th gen achieves 18–28 TPS → `Sperf = 100`
-- A 7B model on same hardware achieves 8–12 TPS → `Sperf = 53–80`
-- We use a 3B model: easier to hit 100 on Sperf
+Implications for us:
+- Local reports can still quote the 15 TPS provisional formula for Gate 1 self-checks
+- Final leaderboard speed is competitive: a slower host (our measured ~8 t/s) hurts more if peers hit 20+ t/s
+- Prefer smaller/faster 3B Q4_K_M; re-benchmark on ADTC-class 4-vCPU Ubuntu before submit
 
-**Target: ≥15 TPS → Sperf = 100**
+**Target: maximize absolute TPS on audit hardware; aim ≥15 t/s so provisional local Sperf ≈ 100**
 
 ### Seff (Efficiency, 20%)
 
@@ -83,36 +86,40 @@ A 3B model at 15–20 TPS sustained inference keeps CPU temperature well below 8
 
 **Target: Zero thermal penalty**
 
-### African Alpha Bonus (+15%)
+### African language / use-case bonus
 
-Swahili UI and prompt routing is ported from the mobile app. This multiplies our panel score.
+- Challenge site: African language functionality → **+15% on panel score**; Budget Profile multiplier **+10%**
+- DevPost rules text: African Use Case Bonus → **up to 10 extra points**
+- Template field: `african_alpha_claim: true` (we claim via Swahili UI + bilingual RAG)
 
-**Target: african_alpha_claim = true → +15%**
+**Target: keep `african_alpha_claim = true` and demonstrate live Swahili Q&A in the demo video**
 
 ---
 
-## Current State (as of June 23, 2026)
+## Current State (as of August 4, 2026)
 
-Significant work is already done. The project has:
+**Phase: Gate 1 submission hardening (Phase 5).** Core product is built; remaining work is audit-ready packaging.
 
 | Component | Status | Notes |
 |---|---|---|
-| `llm_service.dart` | ✅ Complete | llama-server subprocess + SSE streaming |
-| `rag_service.dart` | ✅ Complete | Pure Dart TF-IDF, bilingual, < 5ms |
-| `prompt_service.dart` | ✅ Complete | ChatML format, Qwen2.5-compatible, token budget |
-| `app_config.dart` | ✅ Complete | Model: Qwen2.5-3B Q4_K_M configured |
-| `model_controller.dart` | ✅ Complete | Full lifecycle + sampler settings |
-| `chat_controller.dart` | ✅ Complete | RAG + streaming integrated |
-| Knowledge base (crops) | ✅ Maize, beans, cassava, coffee, tomato | Bilingual entries |
-| Knowledge base (pests) | ✅ FAW, MLN, late blight, stalk borer | 4 detailed bilingual entries |
-| Knowledge base (livestock) | ✅ Goats, poultry, cattle | PPR, parasites, Newcastle, mastitis |
-| Knowledge base (soil/markets/calendars) | ✅ Populated | Single comprehensive doc each |
-| Dart tests | ✅ prompt + rag tests | Run: `flutter test` |
-| Python tests | ✅ Full pytest suite | Run: `pytest tests/ -v` |
-| `metadata.json` | 🔄 Needs team ID | Model info filled in |
-| UI screens | ✅ Implemented | Polish items remain (Phase 3) |
+| Core Flutter + llama-server stack | ✅ Complete | Streaming chat, model lifecycle, ChatML prompts |
+| RAG (pure Dart TF-IDF) | ✅ Complete | Bilingual KB across crops/pests/livestock/soil/markets/calendars |
+| Desktop UI | ✅ Mostly complete | Chat / Knowledge / Models / Settings; minor polish left |
+| Swahili UI + RAG `content_sw` | ✅ Complete | Needs terminology QA pass before video |
+| `metadata.json` | ✅ Complete | Team `1060310`, 2 prompts, alpha + budget claims |
+| `REPORT.md` | ✅ Draft complete | Participant benchmarks filled; accuracy suite empty |
+| Participant profiler run | 🔄 Partial | `submission.json` (2026-06-24): peak RSS ~3274 MB, **8.03 t/s**, `accuracy: []` |
+| Tuned llama-server flags | ✅ Documented | flash-attn / batch 2048 / threads=4; re-profile after ship |
+| Ubuntu 22.04 fresh-clone download | ❌ Open | Must verify `download_model.sh` on clean target OS |
+| Full profiler w/ accuracy | ❌ Open | Do **not** submit `--skip-accuracy` as final report |
+| Public GitHub repo | ✅ Done | `kipkirui/Maathai_Desktop` is public |
+| 2-minute demo video | ❌ Open | Model live + Swahili + offline |
+| DevPost submit | ❌ Open | Hard deadline Aug 25 |
 
-**Model choice is already made: Qwen2.5-3B-Instruct Q4_K_M**
+**Measured local scores (provisional 15 TPS formula, participant laptop):**
+`Seff ≈ 54.3` · `Sperf ≈ 53.5` · thermal OK · RAM safe under 7 GB
+
+**Model choice locked: Qwen2.5-3B-Instruct Q4_K_M**
 
 ---
 
@@ -146,133 +153,41 @@ cat baseline.json
 
 ---
 
-### Phase 1 — Model Verification ✅ (July 1 – July 7)
-**Goal: Confirm Qwen2.5-3B hits TPS and RAM targets on Ubuntu target environment**
+### Phase 1 — Model Verification ✅ (mostly done)
+Participant laptop profiler run exists (`submission.json`, 2026-06-24). Still open: Ubuntu 22.04 / ADTC-class re-run and TPS uplift check after flash-attn / batch tuning.
 
-Since the model is already selected, this phase is about verification, not selection:
+### Phase 2 — Knowledge Base ✅ Complete
+Bilingual corpus shipped under `assets/knowledge_base/` (crops, pests, livestock, soil, markets, calendars).
 
-- [ ] Run `download_model.sh` on Ubuntu 22.04 VM (simulate evaluation environment)
-- [ ] Run `adtc-profiler run --mode participant --skip-accuracy`
-- [ ] Verify `tokens_per_second_generation >= 15` and `peak_rss_mb < 7168`
-- [ ] Run the 2 test prompts manually through `llama-server` on Ubuntu — check answer quality
-- [ ] If TPS < 15 on Ubuntu: evaluate Qwen2.5-1.5B Q4_K_M as fallback (faster, less accurate)
+### Phase 3 — Desktop Application UI ✅ Mostly complete
+Flutter desktop nav + streaming chat + knowledge browser + models/settings. Optional polish: feedback buttons, regenerate, PDF export.
 
-**Milestone: Profiler baseline on Ubuntu VM confirmed with valid `submission.json`**
+### Phase 4 — Fine-Tuning ⏭️ Deferred
+Not blocking Gate 1. RAG + prompt quality is the accuracy lever for now; revisit only if accuracy suite is weak.
 
----
+### Phase 5 — Submission Package 🔄 IN PROGRESS (August 4 – August 18)
+**Goal: Audit-ready Gate 1 package — finish ≥1 week before deadline**
 
-### Phase 2 — Knowledge Base Completion (July 7 – July 21, 14 days)
-**Goal: Offline RAG corpus curated, indexed, retrieval verified**
+**Runbook:** [`GATE1.md`](GATE1.md) · `bash scripts/gate1_verify.sh` (full) / `--smoke` (iterate)
 
-The knowledge base format is already established (JSON with `content` + `content_sw`). Existing content:
-- ✅ Crops: Maize overview, Maize nutrient deficiency, Tomato
-- ✅ Pests: Fall Armyworm, MLN, Late Blight, Maize Stalk Borer
-
-Remaining content to add (all in `assets/knowledge_base/`):
-
-| File | Status | Content source |
+| Day | Task | Status |
 |---|---|---|
-| `crops/beans_cassava.json` (expand) | 🔄 Stub exists | Add cassava mosaic, bean rust, bean root rot |
-| `crops/coffee.json` | ❌ To add | Coffee Berry Disease, Coffee Leaf Rust, KALRO recommendations |
-| `crops/livestock.json` | ❌ To add | Cattle mastitis, goat PPR, poultry Newcastle, dairy cow milk drop |
-| `soil/soil_management.json` (expand) | 🔄 Stub exists | Soil pH, organic matter, erosion control, lime application |
-| `markets/market_prices.json` (expand) | 🔄 Stub exists | Nairobi, Kampala, Dar es Salaam reference prices for major crops |
-| `calendars/planting_calendars.json` (expand) | 🔄 Stub exists | East Africa long/short rains, West Africa, Southern Africa seasons |
+| Aug 4–6 | Confirm HF GGUF URL + `download_model.sh` idempotency | 🔄 Model local; fresh Ubuntu via `gate1_verify.sh` |
+| Aug 6–8 | Re-run `adtc-profiler` **with accuracy** (`gate1_verify.sh` or `run_adtc_profiler.sh --full`) | ❌ |
+| Aug 8–10 | Update `REPORT.md` with final numbers + rule-aligned Sperf note | 🔄 Draft exists |
+| Aug 10–12 | Swahili terminology QA + record ≤2 min demo video ([shot list](GATE1.md)) | ❌ |
+| Aug 12–15 | Public repo + full checklist (`download` → profiler → review) | ❌ |
+| Aug 15–18 | Buffer / fix flag verdicts | ❌ |
+| **Aug 25** | **Submit on DevPost (hard deadline)** | ❌ |
 
-All additions must include `content_sw` (Swahili translation) for the African Alpha Bonus.
-
-Also port from mobile app:
-- `Tomato___Late_blight.json` diagnosis template → add to `pests/pests_diseases.json`
-- `Corn_(maize)___Common_rust_.json` → add to `pests/pests_diseases.json`
-
-**Milestone: Knowledge base covers all 4 hidden prompt topic areas, RAG retrieval quality test passes**
-
----
-
-### Phase 3 — Desktop Application UI (July 21 – August 4, 14 days)
-**Goal: Working, visually clean PyQt6 desktop application**
-
-The Flutter skeleton exists with stub implementations for all screens. The services are already working. This phase completes the UI.
-
-#### Week 1 (July 21–28): Core screens
-
-The following Dart stub files need implementation:
-- `lib/screens/home_screen.dart` — dashboard with quick actions and offline model status
-- `lib/screens/chat_screen.dart` — main agriculture Q&A with streaming token display
-  - Reuse `chat_bubble.dart`, `typing_indicator.dart` widgets (already exist as stubs)
-  - Language toggle (EN / SW) — uses `TranslationController`
-  - Connects to `LlmService.generateStream()` and `RagService.retrieve()`
-- `lib/screens/models_screen.dart` — model download/status (points to `download_model.sh`)
-
-Reuse from mobile app (direct Dart ports):
-- `chat_controller.dart` (exists as stub) — port from mobile `ChatController`
-- `translation_controller.dart` (exists as stub) — port from mobile `TranslationController`
-- `theme_controller.dart` (exists as stub) — port from mobile app
-
-#### Week 2 (July 28 – August 4): Supporting screens + polish
-
-- `lib/screens/knowledge_screen.dart` — browse knowledge base by category
-- Benchmark overlay — live RAM, TPS, CPU temp (shown in settings or debug panel)
-- Offline indicator in status bar (always visible)
-- Swahili UI strings from `assets/i18n/sw.json` (ported from mobile app)
-- App icon using Maathai branding
-
-**Milestone: Full walkthrough of the application on dev machine recorded**
-
----
-
-### Phase 4 — Fine-Tuning (Optional, July 14 – August 4, parallel)
-**Goal: Boost Sacc — highest-weight scoring component (50%)**
-
-Fine-tuning is parallel to Phase 3. If bandwidth allows, it can significantly improve accuracy on the 4 evaluation prompts.
-
-#### Dataset creation
-
-Minimum 200 instruction-response pairs in agriculture domain:
-- Crop diagnosis (symptoms → cause → treatment)
-- Livestock health (symptom → disease → action)
-- Planting calendar queries (location → crop → timing)
-- Market questions (crop → price reference → storage advice)
-- Swahili pairs (same content in Kiswahili)
-
-Sources: KALRO extension guides, FAO training materials, CABI data sheets, mobile app `insight_service.dart` data patterns
-
-#### Fine-tuning process
-
-```bash
-# QLoRA fine-tuning on Colab T4 or local GPU
-# Using Unsloth or TRL
-python fine_tune.py \
-  --base_model Qwen/Qwen2.5-3B-Instruct \
-  --dataset data/agriculture_qa.jsonl \
-  --output_dir checkpoints/maathai-agri-lora \
-  --lora_r 16 --epochs 3 --batch_size 4
-```
-
-#### Post-training
-
-1. Merge LoRA weights into base model
-2. Quantize to GGUF Q4_K_M using `llama.cpp/convert_hf_to_gguf.py` + `llama-quantize`
-3. Verify merged model still passes RAM constraint
-4. Re-run profiler — confirm TPS does not degrade > 10%
-
-**Milestone (if achieved): Fine-tuned `.gguf` with measurably better accuracy on agriculture prompts**
-
----
-
-### Phase 5 — Submission Package (August 4 – August 18, 14 days)
-**Goal: Complete, valid, polished submission — 1 week before deadline**
-
-| Day | Task |
+**Official Gate timeline (DevPost rules, Aug 2026):**
+| Date | Stage |
 |---|---|
-| Aug 4–6 | Upload final `.gguf` to HuggingFace (public repo) |
-| Aug 6–7 | Write `download_model.sh` — test idempotency, test from fresh clone |
-| Aug 7–10 | Write `REPORT.md` — problem, design decisions, constraints, benchmarks |
-| Aug 10–11 | Final `metadata.json` — no placeholder values, 2 test prompts, african_alpha_claim true |
-| Aug 11–13 | Record 2-minute demo video — show model running, Swahili query, benchmark panel |
-| Aug 13–15 | Full submission checklist run: `bash download_model.sh` → `adtc-profiler run` → review JSON |
-| Aug 15–18 | Buffer — fix any issues from checklist run |
-| **Aug 25** | **Submit on DevPost (hard deadline)** |
+| Aug 25 | Gate 1 deadline — prototype + REPORT + video |
+| Sep 8 | Up to 20 semifinalists announced; Gate 2 audit begins |
+| Sep 22 | Semifinalist submission deadline |
+| Sep 29 | Up to 10 finalists announced |
+| Oct 17 | Live defense & awards |
 
 ---
 
@@ -287,36 +202,36 @@ Before submitting on DevPost, every item must be checked:
 - [ ] `.venv/`, `__pycache__/`, `*.pyc` excluded
 
 ### `metadata.json`
-- [ ] `team_id` — matches ADTF portal registration
-- [ ] `domain: "agriculture"` — correct
-- [ ] `language_scope: ["en", "sw"]` — English + Swahili
-- [ ] `african_alpha_claim: true` — Swahili support is live
-- [ ] `budget_laptop_claim: true` — required for all
-- [ ] `submitter` fields — real name, email, GitHub handle
-- [ ] `cross_disciplinary_pairing.load_bearing: true` — RAG is load-bearing
-- [ ] `test_prompts` — exactly 2 prompts, agriculture domain, no placeholders
-- [ ] `model.runtime: "llama.cpp"` — required
-- [ ] `model.quantization` — matches the GGUF file (e.g. `"GGUF Q4_K_M"`)
-- [ ] `_runtime.model_path` — exact relative path to the `.gguf` file
+- [x] `team_id` — `1060310`
+- [x] `domain: "agriculture"` — correct
+- [x] `language_scope: ["en", "sw"]` — English + Swahili
+- [x] `african_alpha_claim: true` — Swahili support is live
+- [x] `budget_laptop_claim: true` — required for all
+- [x] `submitter` fields — real name, email, GitHub handle
+- [x] `cross_disciplinary_pairing.load_bearing: true` — RAG is load-bearing
+- [x] `test_prompts` — exactly 2 prompts, agriculture domain, no placeholders
+- [x] `model.runtime: "llama.cpp"` — required
+- [x] `model.quantization` — `"GGUF Q4_K_M"`
+- [x] `_runtime.model_path` — `model/qwen2.5-3b-instruct-q4_k_m.gguf`
 
 ### `download_model.sh`
-- [ ] Runs without credentials (public URL)
-- [ ] Downloads to `model/` directory
-- [ ] Idempotent (safe to run twice)
-- [ ] Downloaded file path matches `_runtime.model_path`
+- [x] Runs without credentials (public URL)
+- [x] Downloads to `model/` directory
+- [ ] Idempotent verified on clean Ubuntu 22.04
+- [x] Downloaded file path matches `_runtime.model_path`
 
 ### `REPORT.md`
-- [ ] Problem section — African context, target user
-- [ ] Design decisions section — model choice, quantization rationale, RAG architecture
-- [ ] Constraints section — hardware target, offline requirement
-- [ ] Benchmarks table — self-reported TPS, RAM, latency
+- [x] Problem section — African context, target user
+- [x] Design decisions section — model choice, quantization rationale, RAG architecture
+- [x] Constraints section — hardware target, offline requirement
+- [x] Benchmarks table — participant TPS, RAM, latency (re-run before submit)
 
 ### `adtc-profiler` pass
-- [ ] `bash download_model.sh` completes without error
-- [ ] `adtc-profiler run --mode participant --output submission.json --skip-accuracy` exits 0
-- [ ] `submission.json` shows `"measured_on": "participant_laptop"`
-- [ ] `peak_rss_mb` < 7168 (hard limit)
-- [ ] `tokens_per_second_generation` > 15 (target)
+- [ ] `bash download_model.sh` completes without error on fresh Ubuntu
+- [ ] Final `adtc-profiler run --mode participant --output submission.json` **without** `--skip-accuracy`
+- [x] Existing `submission.json` shows `"measured_on": "participant_laptop"` (stale; re-run)
+- [x] `peak_rss_mb` < 7168 (hard limit) — ~3274 MB measured
+- [ ] `tokens_per_second_generation` competitive vs field (provisional local target ≥15)
 
 ### Video
 - [ ] 2 minutes or under
@@ -332,7 +247,7 @@ Before submitting on DevPost, every item must be checked:
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
 | Model exceeds 7 GB RAM → disqualification | Low (with 3B model) | Critical | Test RAM with profiler in Week 1; never use 7B model |
-| TPS below 15 on target hardware | Low–Medium | High | Use 3B model; test on Ubuntu; optimize n_threads=4 |
+| TPS weak vs field TPSmax (relative Sperf) | Medium | High | Stay on 3B Q4_K_M; flash-attn/batch tune; re-bench on ADTC 4-vCPU Ubuntu |
 | Thermal throttling on 90-minute generation load | Low | Medium | 3B model runs cooler; benchmark panel warns if temp > 75°C |
 | Fine-tuned model degrades TPS | Medium | Medium | Benchmark before and after; fine-tuning is optional |
 | HuggingFace download fails during evaluation | Low | Critical | Test `download_model.sh` from fresh clone on Ubuntu |

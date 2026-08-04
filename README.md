@@ -44,11 +44,12 @@ The mobile app's llama.cpp integration is open-source at [`kipkirui/Maathai_llam
 | Competition | [Africa Deep Tech Challenge 2026](https://africadeeptech.org/challenge-2026/) |
 | Track | Agriculture |
 | Runtime | `llama.cpp` (GGUF weights only) |
-| Target hardware | 8 GB RAM, Intel i5 10th–12th gen, integrated GPU, Ubuntu 22.04 |
+| Target hardware | 8 GB RAM, Intel i5 10th–12th gen **or** AMD Ryzen 5, integrated GPU, Ubuntu 22.04 |
 | Languages | English (`en`) + Swahili (`sw`) |
-| African Alpha claim | Yes (+15% bonus) |
+| African Alpha claim | Yes (Swahili; +15% panel / DevPost African Use Case bonus) |
 | Budget laptop claim | Yes |
-| Gate 1 deadline | **August 25, 2026** |
+| Gate 1 deadline | **August 25, 2026** (DevPost: Aug 24 @ 11:45pm PDT) |
+| Status (Aug 4) | Core app + RAG done; Gate 1 packaging / full profiler / video remaining |
 
 ---
 
@@ -90,25 +91,37 @@ flutter pub get
 flutter run -d linux
 ```
 
-### Run the ADTC profiler locally
+### Gate 1 verify + ADTC profiler
+
+Full close-out checklist and video shot list: [`GATE1.md`](GATE1.md).
 
 ```bash
-pip install "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
+# Ubuntu 22.04 / WSL — preferred (download + metadata + profiler + gates)
+bash scripts/gate1_verify.sh           # FULL — accuracy ON (final artifact)
+bash scripts/gate1_verify.sh --smoke   # fast iterate
 
-adtc-profiler run \
-  --submission . \
-  --mode participant \
-  --output submission.json \
-  --skip-accuracy
+# Or call the profiler wrapper directly
+bash scripts/run_adtc_profiler.sh --full
+```
 
-# Check scores
+Manual install (if needed):
+
+```bash
+python3.11 -m pip install "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
+adtc-profiler run --submission . --mode participant --output submission.json
+```
+
+Provisional local score peek (15 t/s reference; official Sperf uses field TPSmax):
+
+```bash
 python -c "
 import json
 with open('submission.json') as f: s = json.load(f)
 print('Peak RAM:', s['memory']['peak_rss_mb'], 'MB')
 print('TPS:', round(s['throughput']['tokens_per_second_generation'], 1))
 print('Seff:', round((7168 - s['memory']['peak_rss_mb']) / 7168 * 100, 1))
-print('Sperf:', round(min(s['throughput']['tokens_per_second_generation'] / 15, 1) * 100, 1))
+print('Sperf (prov 15):', round(min(s['throughput']['tokens_per_second_generation'] / 15, 1) * 100, 1))
+print('Accuracy entries:', len(s.get('accuracy') or []))
 "
 ```
 
@@ -233,10 +246,12 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 | Component | Our target | How we achieve it |
 |---|---|---|
 | Sacc (50%) | High | Battle-tested prompts + RAG over African agricultural data |
-| Sperf (30%) | 100 (≥15 TPS) | 3B model on i5 → 22–28 TPS; well above 15 TPS reference |
-| Seff (20%) | ~64 (~2.5 GB RAM) | 3B model uses far less RAM than 7B competitors |
-| Pthermal | 0 (no penalty) | 3B model keeps CPU below 80°C under sustained load |
-| Alpha Bonus | +15% | Full Swahili support ported from mobile app |
+| Sperf (30%) | Competitive vs field max | Official: `100×(TPSact/TPSmax)`; local provisional ref still 15 t/s |
+| Seff (20%) | ~54+ (measured ~3.3 GB peak) | 3B Q4_K_M stays well under 7 GB |
+| Pthermal | 0 (no penalty) | 3B model; no throttle in participant run |
+| Alpha Bonus | Claimed | Full Swahili UI + bilingual RAG |
+
+**Measured so far (participant laptop, 2026-06-24):** ~8.03 t/s · peak RSS ~3274 MB · `accuracy: []` (must re-run full suite).
 
 ---
 
@@ -244,25 +259,29 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 
 | Gate | Date | Status |
 |---|---|---|
-| Gate 1 | **August 25, 2026** | Open now — build and submit |
-| Gate 2 | September 8–29, 2026 | Technical Q&A + reproducibility audit |
-| Gate 3 | October 17, 2026 | Final pitch + live defense |
+| Gate 1 | **August 25, 2026** | Open — **21 days left** (as of Aug 4); packaging in progress |
+| Semifinalists | September 8, 2026 | Up to 20 teams; Gate 2 audit begins |
+| Semifinalist package | September 22, 2026 | Gate 2 submission |
+| Finalists | September 29, 2026 | Up to 10 teams |
+| Gate 3 / Live defense | October 17, 2026 | Pitch + awards |
 
 ---
 
 ## Competition Checklist
 
-- [ ] Repository is public on GitHub
+See [`GATE1.md`](GATE1.md) for the full close-out + video shot list. Run `bash scripts/gate1_verify.sh --checklist`.
+
+- [x] Repository is public on GitHub
 - [x] `metadata.json` — no placeholder values
 - [ ] `download_model.sh` — works from fresh clone, idempotent (verify on clean Ubuntu 22.04)
 - [x] Model is GGUF format, hosted publicly on HuggingFace
 - [x] `model/*.gguf` excluded from git
 - [x] `REPORT.md` — complete technical writeup (participant benchmarks filled)
 - [x] `LICENSE` — GNU GPL v3
-- [ ] `adtc-profiler run --mode participant` → re-run with accuracy scoring before Gate 1
+- [ ] `bash scripts/gate1_verify.sh` → full run with accuracy
 - [x] Peak RAM < 7168 MB (hard limit) — measured ~3274 MB
 - [ ] Zero network calls during inference (verify offline)
-- [ ] 2-minute demo video recorded
+- [ ] 2-minute demo video recorded (shot list in GATE1.md)
 - [ ] Submitted on DevPost before August 25
 
 ---

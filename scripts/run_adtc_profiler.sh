@@ -2,9 +2,23 @@
 # Run adtc-profiler (participant mode) — same tool judges use for TPS + RAM.
 # Requires: model GGUF, llama-bench in tools/llama-linux/, adtc-profiler in .venv-wsl
 # Setup once: bash scripts/wsl_profiler_setup.sh
-# Usage:      bash scripts/run_adtc_profiler.sh
+# Usage:
+#   bash scripts/run_adtc_profiler.sh           # smoke (skip accuracy) — fast iterate
+#   bash scripts/run_adtc_profiler.sh --full    # Gate 1 final (accuracy ON)
+# Prefer: bash scripts/gate1_verify.sh
 
 set -euo pipefail
+
+FULL=0
+for arg in "$@"; do
+  case "$arg" in
+    --full) FULL=1 ;;
+    -h|--help)
+      sed -n '2,10p' "$0"
+      exit 0
+      ;;
+  esac
+done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -45,14 +59,23 @@ if command -v taskset >/dev/null 2>&1; then
 fi
 
 echo ""
-echo "→ adtc-profiler (participant, --skip-accuracy) — judge-like benchmark..."
-echo "   Uses llama-bench -p 512 -n 128 (same as competition audit)."
-echo "   Takes ~3–8 minutes."
-"${PROFILER_CMD[@]}" \
-  --submission . \
-  --mode participant \
-  --output submission.json \
-  --skip-accuracy
+if [[ "$FULL" -eq 1 ]]; then
+  echo "→ adtc-profiler (participant, FULL / accuracy ON) — Gate 1 artifact..."
+  echo "   Can take 30–90+ minutes."
+  "${PROFILER_CMD[@]}" \
+    --submission . \
+    --mode participant \
+    --output submission.json
+else
+  echo "→ adtc-profiler (participant, --skip-accuracy) — smoke benchmark..."
+  echo "   Uses llama-bench -p 512 -n 128 (same as competition audit)."
+  echo "   Takes ~3–8 minutes. For Gate 1 final: re-run with --full"
+  "${PROFILER_CMD[@]}" \
+    --submission . \
+    --mode participant \
+    --output submission.json \
+    --skip-accuracy
+fi
 
 python3 <<'PY'
 import json
@@ -64,14 +87,16 @@ s = json.loads(p.read_text())
 ram = s["memory"]["peak_rss_mb"]
 tps = s["throughput"]["tokens_per_second_generation"]
 ftl = s["throughput"]["first_token_latency_ms"]
+acc = s.get("accuracy") or []
 seff = (7168 - ram) / 7168 * 100
 sperf = min(tps / 15, 1.0) * 100
 
 print()
 print("=== adtc-profiler results ===")
 print(f"Peak RAM     : {ram:.0f} MB  (limit 7168)  -> Seff {seff:.1f}")
-print(f"Gen TPS      : {tps:.2f}       (ref 15)      -> Sperf {sperf:.1f}")
+print(f"Gen TPS      : {tps:.2f}       (ref 15 prov) -> Sperf {sperf:.1f}")
 print(f"First token  : {ftl:.0f} ms")
+print(f"Accuracy     : {len(acc)} entries")
 print(f"OS           : {s['environment']['os']}")
 print(f"Output       : {p.resolve()}")
 print()
@@ -79,9 +104,11 @@ print("=== Competition gates ===")
 ram_ok = ram < 7168
 tps_target = tps >= 15.0
 print(f"  RAM < 7168 MB (hard)    : {'PASS' if ram_ok else 'FAIL — DISQUALIFICATION RISK'}")
-print(f"  TPS >= 15 (Sperf=100)   : {'PASS' if tps_target else 'below target (scoring only)'}")
+print(f"  TPS >= 15 (provisional) : {'PASS' if tps_target else 'below target (scoring only)'}")
+print(f"  Accuracy present        : {'PASS' if acc else 'MISSING — run with --full for Gate 1'}")
 if not tps_target:
-    print("  Note: WSL dev laptops often report ~9–10 t/s; audit i5 native Ubuntu is faster.")
+    print("  Note: WSL/dev laptops often report ~8–10 t/s; audit i5 native Ubuntu is faster.")
+    print("  Official Sperf uses TPSact/TPSmax across submissions.")
 
 if not ram_ok:
     sys.exit(1)

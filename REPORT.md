@@ -145,11 +145,13 @@ Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise
 
 ## Constraints
 
-### Hardware target
-- 8 GB DDR4 RAM, 4 vCPU (Intel i5 or AMD Ryzen 5)
-- Intel UHD / Iris Xe integrated GPU (no CUDA, no ROCm)
+### Hardware target (ADTC Standard Laptop — current rules)
+- 8 GB DDR4 RAM, 4 vCPU
+- CPU: Intel Core i5 10th–12th gen **or** AMD Ryzen 5 3000–5000 (x86-64)
+- Integrated graphics only (Intel UHD / Iris Xe or AMD Radeon integrated; no discrete GPU / CUDA / ROCm)
 - Ubuntu 22.04 LTS
 - 256 GB SSD
+- Market range: ~$400–$500 new / ~$150–$250 refurbished
 
 ### Key hardware constraint implications
 - No GPU acceleration: pure CPU inference via llama.cpp
@@ -182,8 +184,20 @@ Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise
 **Estimated competition scores (from participant laptop numbers):**
 ```
 Seff  = (7168 − 3273.84) / 7168 × 100  = 54.3
-Sperf = min(8.03 / 15, 1.0) × 100      = 53.5
+
+# Local / profiler provisional estimate (TPS_REFERENCE = 15.0):
+Sperf ≈ min(8.03 / 15, 1.0) × 100     = 53.5
+
+# Official DevPost leaderboard formula (relative to field max):
+Sperf = 100 × (TPSact ÷ TPSmax)         # TPSmax = fastest audit submission
 ```
+
+**Rules alignment (as of August 2026):**
+- Composite: `Stotal = 0.50×Sacc + 0.30×Sperf + 0.20×Seff − Pthermal` (unchanged)
+- `Seff` still uses the 7 GB peak-RSS budget (unchanged)
+- `Sperf` on DevPost is relative to **TPSmax across submissions**; `adtc-profiler` still documents the 15 t/s provisional reference for local estimates
+- African language / use-case bonus claimed via Swahili (`african_alpha_claim: true`)
+- Gate 1 due **August 25, 2026**; final participant report should include the accuracy suite (not `--skip-accuracy`)
 
 **Tuning follow-up (WSL llama-bench on same GGUF, `-p 512 -n 128`):**
 - Best app/server defaults: `-t 4 -b 2048 --flash-attn on --mlock` (see § Inference runtime)
@@ -191,4 +205,4 @@ Sperf = min(8.03 / 15, 1.0) × 100      = 53.5
 - Batch 2048 beats 512/1024; threads >4 lower TPS (oversubscription on 4 logical CPUs)
 - Official Gate `Sperf` still comes from `adtc-profiler` / `llama-bench` defaults — re-run profiler after shipping these `llama-server` flags for app UX; profiler Sperf is independent of the Flutter wrapper
 
-**Notes for Gate 1 judges:** Peak RSS is safely under the 7168 MB hard limit. Throughput on this host is below the 15 t/s `Sperf=100` reference; we will re-run on ADTC-equivalent 4-vCPU hardware. No thermal throttle was observed at `n_threads=4`.
+**Status as of August 4, 2026:** Peak RSS is safely under the 7168 MB hard limit. Participant throughput (~8 t/s) is below the provisional 15 t/s local reference and will score below 100 under the relative TPSmax formula if peers are faster — re-run on ADTC-equivalent 4-vCPU Ubuntu before Gate 1. No thermal throttle observed at `n_threads=4`. Accuracy array still empty in the June participant `submission.json`.
