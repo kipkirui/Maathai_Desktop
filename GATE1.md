@@ -27,7 +27,10 @@ After a full run:
 1. Confirm `submission.json` → `accuracy` is **not** `[]`
 2. Confirm `memory.peak_rss_mb` &lt; 7168
 3. Copy TPS / RAM / TTFT into `REPORT.md` § Benchmarks
-4. Commit `submission.json` (optional but useful for judges/repro)
+4. Keep `submission.json` locally (gitignored) for DevPost / judges
+
+**Accuracy note:** current `lm_eval` `gguf` backend talks HTTP (`/v1/completions`).  
+`gate1_verify.sh` (full mode) patches `adtc-profiler`’s `base_url=local` → `http://127.0.0.1:8080` and starts `llama-server` for the accuracy stage.
 
 ---
 

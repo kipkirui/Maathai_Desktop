@@ -194,6 +194,16 @@ if command -v taskset >/dev/null 2>&1; then
   PROFILER_CMD=(taskset -c 0-3 "$ADTC_BIN" run)
 fi
 
+SERVER_PID=""
+cleanup_server() {
+  if [[ -n "${SERVER_PID}" ]] && kill -0 "$SERVER_PID" 2>/dev/null; then
+    echo "→ stopping llama-server (pid $SERVER_PID)"
+    kill "$SERVER_PID" 2>/dev/null || true
+    wait "$SERVER_PID" 2>/dev/null || true
+  fi
+}
+trap cleanup_server EXIT
+
 echo ""
 if [[ "$SMOKE" -eq 1 ]]; then
   echo "→ adtc-profiler participant SMOKE (~3–8 min, no accuracy)..."
@@ -203,8 +213,57 @@ if [[ "$SMOKE" -eq 1 ]]; then
     --output submission.json \
     --skip-accuracy
 else
+  echo "→ preparing FULL accuracy run (lm_eval gguf needs llama-server HTTP)..."
+  # Upstream adtc-profiler still passes base_url=local; patch to localhost:8080
+  if [[ -x "$VENV/bin/python3.11" ]]; then
+    "$VENV/bin/python3.11" "$SCRIPT_DIR/patch_adtc_accuracy_base_url.py"
+  else
+    python3 "$SCRIPT_DIR/patch_adtc_accuracy_base_url.py"
+  fi
+
+  LLAMA_SERVER="$(command -v llama-server || true)"
+  if [[ -z "$LLAMA_SERVER" && -x "$LLAMA_DIR/llama-server" ]]; then
+    LLAMA_SERVER="$LLAMA_DIR/llama-server"
+  fi
+  if [[ -z "$LLAMA_SERVER" ]]; then
+    echo "FAIL: llama-server required for accuracy (lm_eval --model gguf)."
+    exit 1
+  fi
+
+  echo "→ starting llama-server on :8080 for lm_eval"
+  "$LLAMA_SERVER" \
+    -m "$MODEL_PATH" \
+    --host 127.0.0.1 \
+    --port 8080 \
+    -c 2048 \
+    -t 4 \
+    -ngl 0 \
+    --log-disable \
+    > /tmp/maathai_gate1_llama_server.log 2>&1 &
+  SERVER_PID=$!
+
+  ready=0
+  for _ in $(seq 1 90); do
+    if curl -fsS "http://127.0.0.1:8080/health" >/dev/null 2>&1 \
+      || curl -fsS "http://127.0.0.1:8080/v1/models" >/dev/null 2>&1; then
+      ready=1
+      break
+    fi
+    if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+      echo "FAIL: llama-server exited early. Log:"
+      tail -n 40 /tmp/maathai_gate1_llama_server.log || true
+      exit 1
+    fi
+    sleep 2
+  done
+  if [[ "$ready" -ne 1 ]]; then
+    echo "FAIL: llama-server not ready on :8080 within 180s"
+    tail -n 40 /tmp/maathai_gate1_llama_server.log || true
+    exit 1
+  fi
+  echo "✓ llama-server ready"
+
   echo "→ adtc-profiler participant FULL (includes accuracy; can take 30–90+ min)..."
-  echo "   Tip: use --smoke while iterating; Gate 1 final artifact must be FULL."
   "${PROFILER_CMD[@]}" \
     --submission . \
     --mode participant \
