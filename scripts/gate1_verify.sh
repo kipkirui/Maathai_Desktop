@@ -16,6 +16,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
 
+# WSL sometimes sets HOME to a Windows-style path; force real Linux home for HF cache.
+if [[ -d /home/kipkirui ]]; then
+  export HOME=/home/kipkirui
+  export HF_HOME="${HF_HOME:-/home/kipkirui/.cache/huggingface}"
+  mkdir -p "$HF_HOME"
+fi
+
 SMOKE=0
 CHECKLIST_ONLY=0
 for arg in "$@"; do

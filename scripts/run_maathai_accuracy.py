@@ -22,9 +22,18 @@ def _fast_model_path(path: str) -> str:
 
     src = P(path).resolve()
     posix = str(src)
-    if not (posix.startswith("/mnt/") or posix.startswith("C:")):
+    # Already on a fast FS (home or /tmp)
+    if posix.startswith("/home/") or posix.startswith("/tmp/"):
         return posix
-    dest_dir = P("/tmp/maathai-model")
+    if not (posix.startswith("/mnt/") or posix.startswith("C:") or "\\" in posix):
+        return posix
+
+    # Prefer persistent home over /tmp (cleared on reboot)
+    home = P(os.path.expanduser("~"))
+    if str(home).startswith("/home/"):
+        dest_dir = home / "maathai-model"
+    else:
+        dest_dir = P("/tmp/maathai-model")
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest = dest_dir / src.name
     if not dest.exists() or dest.stat().st_size != src.stat().st_size:
@@ -43,6 +52,25 @@ def main() -> int:
     args = p.parse_args()
 
     model_path = _fast_model_path(args.model_path)
+    print(f"→ accuracy task={args.task} limit={args.limit} model={model_path}", flush=True)
+
+    import os
+    os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+    # Only force offline when ARC-Easy cache looks complete (not just a lock file).
+    ds_root = os.path.expanduser("~/.cache/huggingface/datasets")
+    arc_ok = False
+    if os.path.isdir(ds_root):
+        for root, _dirs, files in os.walk(ds_root):
+            if any(f.endswith(".arrow") or f.endswith(".parquet") for f in files):
+                if "ai2_arc" in root.replace("\\", "/").lower() or "arc" in root.lower():
+                    arc_ok = True
+                    break
+    if arc_ok:
+        os.environ.setdefault("HF_DATASETS_OFFLINE", "1")
+        os.environ.setdefault("HF_HUB_OFFLINE", "1")
+        print("→ using offline HF dataset cache", flush=True)
+    else:
+        print("→ HF dataset cache incomplete; allowing online download", flush=True)
 
     results = simple_evaluate(
         model="maathai_llama_cpp",
@@ -54,6 +82,7 @@ def main() -> int:
         torch_random_seed=args.seed,
         fewshot_random_seed=args.seed,
     )
+    print("→ simple_evaluate finished", flush=True)
     if results is None:
         print("FAIL: simple_evaluate returned None", file=sys.stderr)
         return 1

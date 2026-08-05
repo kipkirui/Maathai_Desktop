@@ -32,6 +32,12 @@ After a full run:
 **Accuracy note:** stock `lm_eval --model gguf` + current `llama-server` cannot do ARC loglikelihood (OpenAI logprobs are completion-only).  
 `gate1_verify.sh` (full mode) patches `adtc-profiler` to call `scripts/run_maathai_accuracy.py`, which scores via **llama-cpp-python** echo logprobs.
 
+**Timing (WSL, model on `/home/...` not `/mnt/d`):**
+- Smoke verify (`--smoke`): ~5–10 min (TPS/RAM only)
+- Accuracy limit=2: ~30–40 min (validated 2026-08-05, score 1.0)
+- Full accuracy limit=50 (default Gate 1): **~6–10 hours** — start overnight
+- Never run accuracy against a GGUF on `/mnt/d` (orders of magnitude slower)
+
 ---
 
 ## 2. Manual checklist

@@ -55,10 +55,23 @@ class MaathaiLlamaCpp(LM):
         super().__init__()
         from llama_cpp import Llama
 
-        # lm_eval may pass pretrained=; accept either and strip accidental doubling
+        # lm_eval may pass pretrained= / model_path=; strip accidental nesting
         path = model_path or pretrained or kwargs.get("pretrained") or ""
-        while path.startswith("pretrained="):
-            path = path.split("=", 1)[1]
+        for _ in range(4):
+            if path.startswith("pretrained="):
+                path = path.split("=", 1)[1]
+            elif path.startswith("model_path="):
+                path = path.split("=", 1)[1]
+            else:
+                break
+        # If lm_eval stuffed the whole argstring into pretrained, keep only the path
+        if "," in path and ("n_ctx=" in path or path.count("=") >= 1):
+            # e.g. "/tmp/foo.gguf,n_ctx=512,..." or "model_path=/tmp/foo,n_ctx=..."
+            first = path.split(",", 1)[0]
+            if first.startswith("model_path="):
+                first = first.split("=", 1)[1]
+            path = first
+        print(f"[maathai_llama_cpp] loading {path} n_ctx={n_ctx} threads={n_threads}", flush=True)
         self.model = Llama(
             model_path=path,
             n_ctx=int(n_ctx),
