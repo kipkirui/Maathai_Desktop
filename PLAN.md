@@ -108,16 +108,16 @@ A 3B model at 15–20 TPS sustained inference keeps CPU temperature well below 8
 | Swahili UI + RAG `content_sw` | ✅ Complete | Needs terminology QA pass before video |
 | `metadata.json` | ✅ Complete | Team `1060310`, 2 prompts, alpha + budget claims |
 | `REPORT.md` | ✅ Draft complete | Participant benchmarks filled; accuracy suite empty |
-| Participant profiler run | 🔄 Partial | `submission.json` (2026-06-24): peak RSS ~3274 MB, **8.03 t/s**, `accuracy: []` |
-| Tuned llama-server flags | ✅ Documented | flash-attn / batch 2048 / threads=4; re-profile after ship |
+| Participant smoke profiler | ✅ Done | Latest: peak RSS ~3274 MB, **5.64 t/s**, thermal OK, `accuracy: []` |
+| Tuned llama-server flags | ✅ Documented | flash-attn / batch 2048 / threads=4 |
 | Ubuntu 22.04 fresh-clone download | ❌ Open | Must verify `download_model.sh` on clean target OS |
-| Full profiler w/ accuracy | ❌ Open | Do **not** submit `--skip-accuracy` as final report |
+| Full profiler w/ accuracy | 🔄 Running | ARC limit=50 overnight; limit=2 probe scored **1.0** |
 | Public GitHub repo | ✅ Done | `kipkirui/Maathai_Desktop` is public |
 | 2-minute demo video | ❌ Open | Model live + Swahili + offline |
 | DevPost submit | ❌ Open | Hard deadline Aug 25 |
 
-**Measured local scores (provisional 15 TPS formula, participant laptop):**
-`Seff ≈ 54.3` · `Sperf ≈ 53.5` · thermal OK · RAM safe under 7 GB
+**Smoke scores (provisional 15 TPS formula, 2026-08-04):**
+`Seff ≈ 54.3` · `Sperf ≈ 37.6` · thermal OK · RAM safe under 7 GB
 
 **Model choice locked: Qwen2.5-3B-Instruct Q4_K_M**
 

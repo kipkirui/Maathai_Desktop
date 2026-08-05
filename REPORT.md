@@ -170,39 +170,52 @@ Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise
 
 *Self-reported development benchmarks from `adtc-profiler` participant mode. Official scores are measured by the ADTC profiler on the standard evaluation machine.*
 
-| Metric | Value | Notes |
-|---|---|---|
-| **Development machine** | Ubuntu 22.04.5 LTS, 11th Gen Intel Core i7-1185G7 @ 3.00 GHz, 11.7 GB RAM, no discrete GPU | Participant laptop run |
-| **Model** | `qwen2.5-3b-instruct-q4_k_m.gguf` | Qwen2.5-3B-Instruct Q4_K_M |
-| **Peak RAM** | 3273.84 MB | Measured by adtc-profiler (`memory.peak_rss_mb`) |
-| **Steady-state RAM** | 3149.29 MB | `memory.steady_state_rss_mb` |
-| **Time to first token** | 18416.73 ms | Cold start on 512-token prompt (includes model/context warm path) |
-| **Generation speed** | 8.03 t/s | Measured over 128-token burst |
-| **Thermal throttling** | None observed | `cpu_thermal.throttled: false`; CPU p99 ≈ 52% |
-| **Profiler mode** | participant | Accuracy suite not yet scored in this file (`accuracy: []`) |
+| Metric | Latest smoke (2026-08-04) | Earlier baseline (2026-06-24) | Notes |
+|---|---|---|---|
+| **Development machine** | Ubuntu 22.04.5 LTS / i7-1185G7 / 11.7 GB / no dGPU | same | WSL participant laptop |
+| **Model** | `qwen2.5-3b-instruct-q4_k_m.gguf` | same | Qwen2.5-3B-Instruct Q4_K_M |
+| **Peak RAM** | **3273.79 MB** | 3273.84 MB | Hard limit 7168 MB — PASS |
+| **Steady-state RAM** | 3140.45 MB | 3149.29 MB | |
+| **Time to first token** | 21200.96 ms | 18416.73 ms | Cold 512-token prompt |
+| **Generation speed** | **5.64 t/s** | 8.03 t/s | WSL variance; neither hits provisional 15 t/s |
+| **Thermal throttling** | false (CPU p99 ≈ 52%) | false | PASS — no Pthermal |
+| **Accuracy** | `[]` in smoke JSON | `[]` | Smoke uses `--skip-accuracy` |
 
-**Estimated competition scores (from participant laptop numbers):**
+**Smoke verdict (Gate 1 hard gates):**
+| Gate | Result |
+|---|---|
+| Peak RSS &lt; 7168 MB | **PASS** (~3274 MB → Seff ≈ 54.3) |
+| No thermal throttle | **PASS** |
+| TPS ≥ 15 (provisional Sperf=100) | **WARN** — 5.64–8.03 t/s on this host |
+| Accuracy suite filled | **Pending** — full run in progress |
+
+**Estimated competition scores (latest smoke):**
 ```
-Seff  = (7168 − 3273.84) / 7168 × 100  = 54.3
+Seff  = (7168 − 3273.79) / 7168 × 100  = 54.3
 
 # Local / profiler provisional estimate (TPS_REFERENCE = 15.0):
-Sperf ≈ min(8.03 / 15, 1.0) × 100     = 53.5
+Sperf ≈ min(5.64 / 15, 1.0) × 100     = 37.6
 
 # Official DevPost leaderboard formula (relative to field max):
 Sperf = 100 × (TPSact ÷ TPSmax)         # TPSmax = fastest audit submission
 ```
+
+**Accuracy (separate from smoke):**
+- Path: `scripts/run_maathai_accuracy.py` (llama-cpp-python; stock `lm_eval --model gguf` incompatible with current llama-server logprobs)
+- Validated 2026-08-05: ARC-Easy **limit=2 → score 1.0** (~33 min, model on Linux home FS)
+- Full Gate 1: `adtc-profiler` + ARC-Easy **limit=50** running now (~6–10 h expected)
 
 **Rules alignment (as of August 2026):**
 - Composite: `Stotal = 0.50×Sacc + 0.30×Sperf + 0.20×Seff − Pthermal` (unchanged)
 - `Seff` still uses the 7 GB peak-RSS budget (unchanged)
 - `Sperf` on DevPost is relative to **TPSmax across submissions**; `adtc-profiler` still documents the 15 t/s provisional reference for local estimates
 - African language / use-case bonus claimed via Swahili (`african_alpha_claim: true`)
-- Gate 1 due **August 25, 2026**; final participant report should include the accuracy suite (not `--skip-accuracy`)
+- Gate 1 due **August 25, 2026**
 
 **Tuning follow-up (WSL llama-bench on same GGUF, `-p 512 -n 128`):**
 - Best app/server defaults: `-t 4 -b 2048 --flash-attn on --mlock` (see § Inference runtime)
 - Flash-attn on ≈ **9.4 t/s** vs ≈ **8.1 t/s** with flash-attn off (~15% gain on this host)
 - Batch 2048 beats 512/1024; threads >4 lower TPS (oversubscription on 4 logical CPUs)
-- Official Gate `Sperf` still comes from `adtc-profiler` / `llama-bench` defaults — re-run profiler after shipping these `llama-server` flags for app UX; profiler Sperf is independent of the Flutter wrapper
+- Official Gate `Sperf` still comes from `adtc-profiler` / `llama-bench` defaults — re-run on ADTC-class 4-vCPU Ubuntu for a fairer TPS number
 
-**Status as of August 5, 2026:** Peak RSS is safely under the 7168 MB hard limit. Latest smoke TPS on this host was ~5.6–8 t/s (WSL variance) — below the provisional 15 t/s local reference; official Sperf uses field TPSmax. No thermal throttle at `n_threads=4`. Accuracy path validated with `scripts/run_maathai_accuracy.py` (llama-cpp-python): ARC-Easy limit=2 → score **1.0** (~33 min). Full Gate 1 `adtc-profiler` run with accuracy limit=50 is in progress overnight (~6–10 h expected on WSL with GGUF on Linux home FS, not `/mnt/d`).
+**Status as of August 5, 2026 (morning):** Smoke hard gates PASS (RAM + thermal). TPS is the soft gap. Full accuracy `limit=50` job is active (`run_maathai_accuracy.py`, ~23+ min in, high CPU). After it finishes, refresh this table from the new `submission.json` and record the demo video.

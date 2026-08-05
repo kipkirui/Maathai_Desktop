@@ -251,7 +251,8 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 | Pthermal | 0 (no penalty) | 3B model; no throttle in participant run |
 | Alpha Bonus | Claimed | Full Swahili UI + bilingual RAG |
 
-**Measured so far (participant laptop, 2026-06-24):** ~8.03 t/s · peak RSS ~3274 MB · `accuracy: []` (must re-run full suite).
+**Smoke (2026-08-04):** 5.64 t/s · peak RSS 3274 MB · thermal OK · `accuracy: []`  
+**Accuracy probe (2026-08-05):** ARC-Easy limit=2 → score 1.0; full limit=50 run in progress.
 
 ---
 
