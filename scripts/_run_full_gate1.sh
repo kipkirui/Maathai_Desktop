@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
+# Full Gate 1 verify (llama-bench + accuracy limit=50). Expect 6–10 hours on WSL.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-VENV=".venv-wsl"
-# Prefer 3.11 — lm-eval / adtc accuracy stack was installed there
-if [[ -x "$VENV/bin/python3.11" ]]; then
-  PY="$VENV/bin/python3.11"
-elif [[ -x "$VENV/bin/python" ]]; then
-  PY="$VENV/bin/python"
-else
-  echo "Missing $VENV — run: bash scripts/wsl_profiler_setup.sh --install-only"
-  exit 1
+export HOME=/home/kipkirui
+export HF_HOME=/home/kipkirui/.cache/huggingface
+mkdir -p "$HF_HOME"
+
+MODEL_SRC="$PWD/model/qwen2.5-3b-instruct-q4_k_m.gguf"
+MODEL_DST=/home/kipkirui/maathai-model/qwen2.5-3b-instruct-q4_k_m.gguf
+mkdir -p "$(dirname "$MODEL_DST")"
+if [[ ! -f "$MODEL_DST" ]] || [[ "$(stat -c%s "$MODEL_DST" 2>/dev/null || echo 0)" -ne "$(stat -c%s "$MODEL_SRC")" ]]; then
+  echo "→ copying GGUF to $MODEL_DST"
+  cp -f "$MODEL_SRC" "$MODEL_DST"
 fi
-export PATH="$(pwd)/tools/llama-linux:$VENV/bin:$PATH"
-"$PY" -c 'import lm_eval; print("lm_eval", lm_eval.__version__)'
-sed -i 's/\r$//' scripts/gate1_verify.sh scripts/patch_adtc_accuracy_base_url.py 2>/dev/null || true
-"$PY" scripts/patch_adtc_accuracy_base_url.py
-export VIRTUAL_ENV="$(pwd)/$VENV"
-hash -r
+
+sed -i 's/\r$//' scripts/gate1_verify.sh scripts/*.py 2>/dev/null || true
+# Ensure accuracy runner patch is applied
+.venv-wsl/bin/python3.11 scripts/patch_adtc_accuracy_runner.py
+
+echo "=== starting FULL gate1_verify at $(date -Is) ==="
 bash scripts/gate1_verify.sh
+echo "=== finished FULL gate1_verify at $(date -Is) ==="
