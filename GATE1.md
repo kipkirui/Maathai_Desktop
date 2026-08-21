@@ -15,11 +15,27 @@ From repo root:
 # Full Gate 1 artifact (accuracy ON — use for final submission.json)
 bash scripts/gate1_verify.sh
 
+# Same, but cap the process tree at 8 GiB like the ADTC laptop (native Linux)
+bash scripts/gate1_verify.sh --mem-8g
+
 # Fast iterate while fixing toolchain
 bash scripts/gate1_verify.sh --smoke
+bash scripts/gate1_verify.sh --smoke --mem-8g
 
 # Human remaining tasks only
 bash scripts/gate1_verify.sh --checklist
+```
+
+**Do we need more tests?** No more llama-bench / RAM smoke loops. Peak RSS already PASSes with ~4 GB of headroom. Throughput and heat on the 15W U laptop will not improve by re-measuring.
+
+**Do we need one more profiler run?** Yes — one **full** (`no --smoke`) run whose `submission.json` has a non-empty `accuracy` array. Prefer `--mem-8g` so that artifact matches the 8 GB evaluation laptop. If ARC-Easy limit=50 is already running on this host, **let it finish**; then run `--smoke --mem-8g` only if you still want an 8 GB RAM proof. Do not kill a live accuracy job to restart under 8 GB.
+
+**WSL 8 GB cap:** `systemd-run` cannot limit WSL2 host RAM. Put this in `%UserProfile%\.wslconfig`, then `wsl --shutdown` and reopen:
+
+```ini
+[wsl2]
+memory=8GB
+processors=4
 ```
 
 After a full run:

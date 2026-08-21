@@ -107,17 +107,17 @@ A 3B model at 15–20 TPS sustained inference keeps CPU temperature well below 8
 | Desktop UI | ✅ Mostly complete | Chat / Knowledge / Models / Settings; minor polish left |
 | Swahili UI + RAG `content_sw` | ✅ Complete | Needs terminology QA pass before video |
 | `metadata.json` | ✅ Complete | Team `1060310`, 2 prompts, alpha + budget claims |
-| `REPORT.md` | ✅ Draft complete | Participant benchmarks filled; accuracy suite empty |
-| Participant smoke profiler | ✅ Done | Latest: peak RSS ~3274 MB, **5.64 t/s**, thermal OK, `accuracy: []` |
+| `REPORT.md` | ✅ Draft complete | Native 2026-08-21 numbers in; refresh after 8 GB full run |
+| Participant smoke profiler | ✅ Done | Native: peak RSS **3177 MB**, **3.59 t/s**, thermal WARN. WSL: ~3274 MB, 5.6–7.7 t/s |
 | Tuned llama-server flags | ✅ Documented | flash-attn / batch 2048 / threads=4 |
 | Ubuntu 22.04 fresh-clone download | ❌ Open | Must verify `download_model.sh` on clean target OS |
-| Full profiler w/ accuracy | 🔄 Running | ARC limit=50 overnight; limit=2 probe scored **1.0** |
+| Full profiler w/ accuracy | 🔄 One more run | WSL n=50 scored **0.34**; native 8 GB full (`--mem-8g`) is the Gate 1 JSON |
 | Public GitHub repo | ✅ Done | `kipkirui/Maathai_Desktop` is public |
 | 2-minute demo video | ❌ Open | Model live + Swahili + offline |
 | DevPost submit | ❌ Open | Hard deadline Aug 25 |
 
-**Smoke scores (provisional 15 TPS formula, 2026-08-04):**
-`Seff ≈ 54.3` · `Sperf ≈ 37.6` · thermal OK · RAM safe under 7 GB
+**Native laptop (2026-08-21, 15.4 GB host):** Seff ≈ 55.7 · Sperf(prov) ≈ 23.9 · thermal WARN · RAM PASS  
+**WSL accuracy (2026-08-05):** ARC-Easy n=50 → **0.34**. Next: `bash scripts/gate1_verify.sh --mem-8g` (no extra bench loops).
 
 **Model choice locked: Qwen2.5-3B-Instruct Q4_K_M**
 
@@ -173,8 +173,8 @@ Not blocking Gate 1. RAG + prompt quality is the accuracy lever for now; revisit
 | Day | Task | Status |
 |---|---|---|
 | Aug 4–6 | Confirm HF GGUF URL + `download_model.sh` idempotency | 🔄 Model local; fresh Ubuntu via `gate1_verify.sh` |
-| Aug 6–8 | Re-run `adtc-profiler` **with accuracy** (`gate1_verify.sh` or `run_adtc_profiler.sh --full`) | ❌ |
-| Aug 8–10 | Update `REPORT.md` with final numbers + rule-aligned Sperf note | 🔄 Draft exists |
+| Aug 6–8 | Re-run `adtc-profiler` **with accuracy** (`gate1_verify.sh` or `run_adtc_profiler.sh --full`) | 🔄 WSL 0.34; native `--mem-8g` remaining |
+| Aug 8–10 | Update `REPORT.md` with final numbers + rule-aligned Sperf note | 🔄 Draft exists; refresh after 8 GB run |
 | Aug 10–12 | Swahili terminology QA + record ≤2 min demo video ([shot list](GATE1.md)) | ❌ |
 | Aug 12–15 | Public repo + full checklist (`download` → profiler → review) | ❌ |
 | Aug 15–18 | Buffer / fix flag verdicts | ❌ |

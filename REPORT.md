@@ -179,7 +179,7 @@ Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise
 | **Time to first token** | 48792.58 ms | 21200.96 ms | Cold 512-token prompt |
 | **Generation speed** | **3.59 t/s** | 5.64 t/s | Official `llama-bench -ngl 0`; neither hits provisional 15 t/s |
 | **Thermal throttling** | **true** (package 100 °C) | false (CPU p99 ≈ 52%) | −10 Pthermal risk on this 15W U host |
-| **Accuracy** | filling (ARC-Easy limit=50) | `[]` (smoke `--skip-accuracy`) | Do not ship empty `accuracy` |
+| **Accuracy** | filling (ARC-Easy limit=50) | **0.34** `acc_norm` (ARC-Easy n=50, 2026-08-05 full run) | Native 8 GB full run still the Gate 1 JSON |
 
 **Smoke / participant verdict (this laptop, 2026-08-21):**
 | Gate | Result |
@@ -187,7 +187,7 @@ Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise
 | Peak RSS &lt; 7168 MB | **PASS** (~3177 MB → Seff ≈ 55.7) |
 | No thermal throttle | **WARN** — package 100 °C, `throttled: true` |
 | TPS ≥ 15 (provisional Sperf=100) | **WARN** — 3.59 t/s on this host |
-| Accuracy suite filled | **Pending** — ARC-Easy limit=50 running after GGML backend fix |
+| Accuracy suite filled | **Pending on this laptop** — WSL full run already scored ARC-Easy n=50 at **0.34**; native limit=50 was re-started after the GGML fix |
 
 **Estimated competition scores (this laptop, throughput/RAM only):**
 ```
@@ -203,8 +203,9 @@ Sperf = 100 × (TPSact ÷ TPSmax)         # TPSmax = fastest audit submission
 **Accuracy (separate from smoke):**
 - Path: `scripts/run_maathai_accuracy.py` (llama-cpp-python; stock `lm_eval --model gguf` incompatible with current llama-server logprobs)
 - Validated 2026-08-05: ARC-Easy **limit=2 → score 1.0** (~33 min, model on Linux home FS)
-- 2026-08-21: first full `gate1_verify.sh` wrote empty `accuracy` because llama-cpp-python could not find `libggml-cpu` (fixed in `scripts/maathai_lm_eval_model.py` + `scripts/gate1_verify.sh`)
-- Full Gate 1: ARC-Easy **limit=50** re-started after that fix; refresh this table when `submission.json` → `accuracy` is non-empty
+- Completed WSL full run (2026-08-05, `submission.json`): ARC-Easy **limit=50 → 0.34** `acc_norm` (50 samples)
+- 2026-08-21: first native `gate1_verify.sh` wrote empty `accuracy` because llama-cpp-python could not find `libggml-cpu` (fixed in `scripts/maathai_lm_eval_model.py` + `scripts/gate1_verify.sh`)
+- Native follow-up: one **8 GB-capped full** run (`bash scripts/gate1_verify.sh --mem-8g`) is the remaining technical artifact — not more RAM/TPS smokes. Refresh this table when that JSON lands.
 
 **Rules alignment (as of August 2026):**
 - Composite: `Stotal = 0.50×Sacc + 0.30×Sperf + 0.20×Seff − Pthermal` (unchanged)
@@ -219,4 +220,4 @@ Sperf = 100 × (TPSact ÷ TPSmax)         # TPSmax = fastest audit submission
 - Batch 2048 beats 512/1024; threads >4 lower TPS (oversubscription on 4 logical CPUs)
 - Official Gate `Sperf` still comes from `adtc-profiler` / `llama-bench` defaults — re-run on ADTC-class 4-vCPU Ubuntu for a fairer TPS number
 
-**Status as of August 21, 2026:** Hard RAM gate PASS on this i7-10610U laptop. Throughput 3.59 t/s; package thermal throttle at 100 °C (−10 Pthermal risk). Accuracy suite was empty until the GGML backend load path was fixed; limit=50 is running. After it finishes, refresh this table from `submission.json`, then record the demo video (GATE1.md). Human remaining: airplane-mode EN+SW proof, ≤2 min video, DevPost draft.
+**Status as of August 21, 2026:** RAM/TPS/thermal on this 15.4 GB i7-10610U laptop are sufficient as development evidence (peak RSS **PASS**, TPS/heat **WARN**, host-limited). No further bench sweeps. Remaining technical item: **one** full profiler JSON with accuracy, preferably `bash scripts/gate1_verify.sh --mem-8g` so host RAM matches the ADTC 8 GB laptop (peak RSS ~3.2 GB should still PASS). Best filled accuracy so far is WSL ARC-Easy n=50 at **0.34**. After that JSON lands, refresh this table, then record the demo video (GATE1.md). Human remaining: airplane-mode EN+SW proof, ≤2 min video, DevPost draft.

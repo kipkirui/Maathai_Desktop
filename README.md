@@ -98,6 +98,7 @@ Full close-out checklist and video shot list: [`GATE1.md`](GATE1.md).
 ```bash
 # Ubuntu 22.04 / WSL — preferred (download + metadata + profiler + gates)
 bash scripts/gate1_verify.sh           # FULL — accuracy ON (final artifact)
+bash scripts/gate1_verify.sh --mem-8g  # same, cgroup-capped at 8 GiB (ADTC laptop)
 bash scripts/gate1_verify.sh --smoke   # fast iterate
 
 # Or call the profiler wrapper directly
@@ -280,8 +281,8 @@ See [`GATE1.md`](GATE1.md) for the full close-out + video shot list. Run `bash s
 - [x] `model/*.gguf` excluded from git
 - [x] `REPORT.md` — complete technical writeup (participant benchmarks filled)
 - [x] `LICENSE` — GNU GPL v3
-- [ ] `bash scripts/gate1_verify.sh` → full run with accuracy (GGUF load fix landed; ARC-Easy limit=50 running)
-- [x] Peak RAM < 7168 MB (hard limit) — measured ~3274 MB
+- [ ] `bash scripts/gate1_verify.sh --mem-8g` → one 8 GB-capped full run (WSL ARC-Easy n=50 already **0.34**)
+- [x] Peak RAM < 7168 MB (hard limit) — native ~3177 MB / WSL ~3274 MB
 - [ ] Zero network calls during inference (verify offline)
 - [ ] 2-minute demo video recorded (shot list in GATE1.md)
 - [ ] Submitted on DevPost before August 25

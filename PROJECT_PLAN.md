@@ -99,13 +99,11 @@ We are building a Flutter desktop application that delivers offline agricultural
 - Final participant report should include accuracy (do not ship `--skip-accuracy` as the Gate 1 artifact)
 - Timeline: Gate 1 Aug 25 → semifinalists Sep 8 → semifinal package Sep 22 → finalists Sep 29 → live defense Oct 17
 
-- [x] Initial participant profiling (`submission.json` 2026-06-24)
-  - peak RSS ~3274 MB (< 7 GB) ✅
-  - TPS 8.03 (below provisional 15; competitive TPSmax risk) 🔄
-  - no thermal throttling at 4 threads ✅
-  - `accuracy: []` — must re-run full suite ❌
+- [x] Initial participant profiling
+  - Native 2026-08-21: peak RSS **3177 MB** (< 7 GB) ✅ · **3.59 t/s** 🔄 · thermal WARN
+  - WSL 2026-08-05: peak RSS ~3274 MB ✅ · 5.6–7.7 t/s · ARC-Easy n=50 **0.34**
 - [x] RAM / runtime tuning documented (`n_ctx=4096`, `n_batch=2048`, `threads=4`, flash-attn on, `n_gpu_layers=0`)
-- [ ] Re-run profiler after shipping tuned flags; prefer ADTC-class 4-vCPU Ubuntu
+- [ ] One remaining profiler run: `bash scripts/gate1_verify.sh --mem-8g` (8 GB host cap; do not add more bench loops)
 - [ ] Test `download_model.sh` on fresh Ubuntu 22.04 VM (no prior downloads)
 - [ ] Verify both `metadata.json` test prompts produce grounded responses (RAG + model)
 - [x] Unit tests exist for RAG / prompts / submission metadata
@@ -124,9 +122,9 @@ We are building a Flutter desktop application that delivers offline agricultural
 - [x] `REPORT.md` — complete, accurate benchmark numbers (participant laptop; refresh after re-profile)
 - [x] `LICENSE` — GNU GPL v3 present
 - [x] README — clear build instructions
-- [ ] Repo is public
+- [x] Repo is public
 - [x] `*.gguf` excluded from git (local weights present under `model/` for dev)
-- [ ] `adtc-profiler run --mode participant` → accuracy scored; improve TPS if needed
+- [ ] `bash scripts/gate1_verify.sh --mem-8g` → accuracy in `submission.json`; then refresh REPORT
 - [ ] 2-minute demo video uploaded
 - [ ] DevPost submission form completed
 

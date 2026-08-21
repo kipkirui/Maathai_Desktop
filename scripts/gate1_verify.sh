@@ -8,6 +8,8 @@
 # Usage (from repo root):
 #   bash scripts/gate1_verify.sh              # full participant run (accuracy ON)
 #   bash scripts/gate1_verify.sh --smoke      # skip accuracy (faster iterate)
+#   bash scripts/gate1_verify.sh --mem-8g     # full run capped at 8 GiB RAM (ADTC laptop)
+#   bash scripts/gate1_verify.sh --smoke --mem-8g
 #   bash scripts/gate1_verify.sh --checklist  # print remaining Gate 1 tasks only
 # -----------------------------------------------------------------------------
 set -euo pipefail
@@ -25,12 +27,14 @@ fi
 
 SMOKE=0
 CHECKLIST_ONLY=0
+MEM_8G=0
 for arg in "$@"; do
   case "$arg" in
     --smoke) SMOKE=1 ;;
+    --mem-8g|--mem8g) MEM_8G=1 ;;
     --checklist) CHECKLIST_ONLY=1 ;;
     -h|--help)
-      sed -n '2,14p' "$0"
+      sed -n '2,16p' "$0"
       exit 0
       ;;
     *)
@@ -39,6 +43,28 @@ for arg in "$@"; do
       ;;
   esac
 done
+
+# Re-exec under an 8 GiB cgroup so peak RSS is measured like the ADTC 8 GB laptop.
+# WSL: this often cannot cap host RAM — set memory=8GB in %UserProfile%\.wslconfig instead.
+if [[ "$MEM_8G" -eq 1 && "${MAATHAI_MEM8G:-0}" != 1 && "$CHECKLIST_ONLY" -eq 0 ]]; then
+  if ! command -v systemd-run >/dev/null 2>&1; then
+    echo "ERROR: --mem-8g needs systemd-run (native Linux). On WSL2 set memory=8GB in .wslconfig."
+    exit 1
+  fi
+  echo "→ re-exec under MemoryMax=8G MemorySwapMax=0"
+  export MAATHAI_MEM8G=1
+  if systemd-run --user --quiet --scope -p MemoryMax=8G true 2>/dev/null; then
+    exec systemd-run --user --collect --wait --pty --same-dir \
+      -p MemoryMax=8G -p MemorySwapMax=0 -- bash "$0" "$@"
+  fi
+  echo "→ user cgroup MemoryMax denied; using sudo systemd-run"
+  exec sudo --preserve-env=HOME,HF_HOME,MAATHAI_MEM8G,PATH,VIRTUAL_ENV \
+    systemd-run --collect --wait --pty --same-dir \
+      -p MemoryMax=8G -p MemorySwapMax=0 -- bash "$0" "$@"
+fi
+if [[ "${MAATHAI_MEM8G:-0}" == 1 ]]; then
+  echo "→ 8 GiB RAM cap active (MemoryMax=8G, swap off)"
+fi
 
 print_checklist() {
   local repo_public="[ ]"
@@ -75,7 +101,7 @@ fi
 
 echo "=== Maathai Desktop — Gate 1 verify ==="
 echo "Repo  : $REPO_ROOT"
-echo "Mode  : $([[ "$SMOKE" -eq 1 ]] && echo 'SMOKE (--skip-accuracy)' || echo 'FULL (accuracy included)')"
+echo "Mode  : $([[ "$SMOKE" -eq 1 ]] && echo 'SMOKE (--skip-accuracy)' || echo 'FULL (accuracy included)')$([[ "${MAATHAI_MEM8G:-0}" == 1 ]] && echo ' + 8GiB RAM cap')"
 echo ""
 
 # --- metadata sanity ---
