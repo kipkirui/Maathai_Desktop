@@ -251,8 +251,9 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 | Pthermal | 0 (no penalty) | 3B model; no throttle in participant run |
 | Alpha Bonus | Claimed | Full Swahili UI + bilingual RAG |
 
-**Smoke (2026-08-04):** 5.64 t/s · peak RSS 3274 MB · thermal OK · `accuracy: []`  
-**Accuracy probe (2026-08-05):** ARC-Easy limit=2 → score 1.0; full limit=50 run in progress.
+**This laptop (2026-08-21):** 3.59 t/s · peak RSS 3177 MB · throttled 100 °C · accuracy filling  
+**WSL smoke (2026-08-04):** 5.64 t/s · peak RSS 3274 MB · thermal OK · `accuracy: []`  
+**Accuracy probe (2026-08-05):** ARC-Easy limit=2 → score 1.0; full limit=50 re-run in progress.
 
 ---
 
@@ -260,7 +261,7 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 
 | Gate | Date | Status |
 |---|---|---|
-| Gate 1 | **August 25, 2026** | Open — **21 days left** (as of Aug 4); packaging in progress |
+| Gate 1 | **August 25, 2026** | Open — **4 days left** (as of Aug 21); packaging in progress |
 | Semifinalists | September 8, 2026 | Up to 20 teams; Gate 2 audit begins |
 | Semifinalist package | September 22, 2026 | Gate 2 submission |
 | Finalists | September 29, 2026 | Up to 10 teams |
@@ -279,7 +280,7 @@ See [`GATE1.md`](GATE1.md) for the full close-out + video shot list. Run `bash s
 - [x] `model/*.gguf` excluded from git
 - [x] `REPORT.md` — complete technical writeup (participant benchmarks filled)
 - [x] `LICENSE` — GNU GPL v3
-- [ ] `bash scripts/gate1_verify.sh` → full run with accuracy
+- [ ] `bash scripts/gate1_verify.sh` → full run with accuracy (GGUF load fix landed; ARC-Easy limit=50 running)
 - [x] Peak RAM < 7168 MB (hard limit) — measured ~3274 MB
 - [ ] Zero network calls during inference (verify offline)
 - [ ] 2-minute demo video recorded (shot list in GATE1.md)

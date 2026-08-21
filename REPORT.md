@@ -85,14 +85,14 @@ n_ubatch        = 512      # llama.cpp default physical micro-batch
 n_gpu_layers    = 0        # CPU-only (integrated GPU)
 flash_attn      = on       # ~15% gen TPS gain vs flash-attn off on Qwen2.5-3B
 mlock           = on       # keep weights resident; peak RSS still ~3.3 GB
-prio            = 1        # medium process priority under desktop UI
+prio            = 0        # omit --prio; unprivileged Linux cannot setpriority(1)
 cache_type_k/v  = f16      # fastest KV; q8_0 is a RAM tradeoff if needed
 OMP/OpenBLAS    = 4        # env caps so BLAS cannot oversubscribe CPUs
 temperature     = 0.7
 top_k           = 40
 top_p           = 0.95
 repeat_penalty  = 1.1
-max_tokens      = 512
+max_tokens      = 256      # shorter replies on 15W U-class CPUs; settings slider still allows more
 ```
 
 These parameters are ported from `ModelController.dart` in the Maathai mobile app (sampler) and refined for desktop via llama-bench sweeps on the competition GGUF.
@@ -170,31 +170,31 @@ Flutter was chosen over Python+PyQt6 because the team has deep Flutter expertise
 
 *Self-reported development benchmarks from `adtc-profiler` participant mode. Official scores are measured by the ADTC profiler on the standard evaluation machine.*
 
-| Metric | Latest smoke (2026-08-04) | Earlier baseline (2026-06-24) | Notes |
+| Metric | This laptop (2026-08-21) | Earlier WSL smoke (2026-08-04) | Notes |
 |---|---|---|---|
-| **Development machine** | Ubuntu 22.04.5 LTS / i7-1185G7 / 11.7 GB / no dGPU | same | WSL participant laptop |
+| **Development machine** | Ubuntu 24.04.4 / i7-10610U / 15.4 GB / no dGPU | Ubuntu 22.04.5 / i7-1185G7 / 11.7 GB / WSL | 15W U vs 28W Tiger Lake |
 | **Model** | `qwen2.5-3b-instruct-q4_k_m.gguf` | same | Qwen2.5-3B-Instruct Q4_K_M |
-| **Peak RAM** | **3273.79 MB** | 3273.84 MB | Hard limit 7168 MB — PASS |
-| **Steady-state RAM** | 3140.45 MB | 3149.29 MB | |
-| **Time to first token** | 21200.96 ms | 18416.73 ms | Cold 512-token prompt |
-| **Generation speed** | **5.64 t/s** | 8.03 t/s | WSL variance; neither hits provisional 15 t/s |
-| **Thermal throttling** | false (CPU p99 ≈ 52%) | false | PASS — no Pthermal |
-| **Accuracy** | `[]` in smoke JSON | `[]` | Smoke uses `--skip-accuracy` |
+| **Peak RAM** | **3176.89 MB** | 3273.79 MB | Hard limit 7168 MB — PASS |
+| **Steady-state RAM** | 2824.66 MB | 3140.45 MB | |
+| **Time to first token** | 48792.58 ms | 21200.96 ms | Cold 512-token prompt |
+| **Generation speed** | **3.59 t/s** | 5.64 t/s | Official `llama-bench -ngl 0`; neither hits provisional 15 t/s |
+| **Thermal throttling** | **true** (package 100 °C) | false (CPU p99 ≈ 52%) | −10 Pthermal risk on this 15W U host |
+| **Accuracy** | filling (ARC-Easy limit=50) | `[]` (smoke `--skip-accuracy`) | Do not ship empty `accuracy` |
 
-**Smoke verdict (Gate 1 hard gates):**
+**Smoke / participant verdict (this laptop, 2026-08-21):**
 | Gate | Result |
 |---|---|
-| Peak RSS &lt; 7168 MB | **PASS** (~3274 MB → Seff ≈ 54.3) |
-| No thermal throttle | **PASS** |
-| TPS ≥ 15 (provisional Sperf=100) | **WARN** — 5.64–8.03 t/s on this host |
-| Accuracy suite filled | **Pending** — full run in progress |
+| Peak RSS &lt; 7168 MB | **PASS** (~3177 MB → Seff ≈ 55.7) |
+| No thermal throttle | **WARN** — package 100 °C, `throttled: true` |
+| TPS ≥ 15 (provisional Sperf=100) | **WARN** — 3.59 t/s on this host |
+| Accuracy suite filled | **Pending** — ARC-Easy limit=50 running after GGML backend fix |
 
-**Estimated competition scores (latest smoke):**
+**Estimated competition scores (this laptop, throughput/RAM only):**
 ```
-Seff  = (7168 − 3273.79) / 7168 × 100  = 54.3
+Seff  = (7168 − 3176.89) / 7168 × 100  = 55.7
 
 # Local / profiler provisional estimate (TPS_REFERENCE = 15.0):
-Sperf ≈ min(5.64 / 15, 1.0) × 100     = 37.6
+Sperf ≈ min(3.59 / 15, 1.0) × 100     = 23.9
 
 # Official DevPost leaderboard formula (relative to field max):
 Sperf = 100 × (TPSact ÷ TPSmax)         # TPSmax = fastest audit submission
@@ -203,7 +203,8 @@ Sperf = 100 × (TPSact ÷ TPSmax)         # TPSmax = fastest audit submission
 **Accuracy (separate from smoke):**
 - Path: `scripts/run_maathai_accuracy.py` (llama-cpp-python; stock `lm_eval --model gguf` incompatible with current llama-server logprobs)
 - Validated 2026-08-05: ARC-Easy **limit=2 → score 1.0** (~33 min, model on Linux home FS)
-- Full Gate 1: `adtc-profiler` + ARC-Easy **limit=50** running now (~6–10 h expected)
+- 2026-08-21: first full `gate1_verify.sh` wrote empty `accuracy` because llama-cpp-python could not find `libggml-cpu` (fixed in `scripts/maathai_lm_eval_model.py` + `scripts/gate1_verify.sh`)
+- Full Gate 1: ARC-Easy **limit=50** re-started after that fix; refresh this table when `submission.json` → `accuracy` is non-empty
 
 **Rules alignment (as of August 2026):**
 - Composite: `Stotal = 0.50×Sacc + 0.30×Sperf + 0.20×Seff − Pthermal` (unchanged)
@@ -218,4 +219,4 @@ Sperf = 100 × (TPSact ÷ TPSmax)         # TPSmax = fastest audit submission
 - Batch 2048 beats 512/1024; threads >4 lower TPS (oversubscription on 4 logical CPUs)
 - Official Gate `Sperf` still comes from `adtc-profiler` / `llama-bench` defaults — re-run on ADTC-class 4-vCPU Ubuntu for a fairer TPS number
 
-**Status as of August 5, 2026 (morning):** Smoke hard gates PASS (RAM + thermal). TPS is the soft gap. Full accuracy `limit=50` job is active (`run_maathai_accuracy.py`, ~23+ min in, high CPU). After it finishes, refresh this table from the new `submission.json` and record the demo video.
+**Status as of August 21, 2026:** Hard RAM gate PASS on this i7-10610U laptop. Throughput 3.59 t/s; package thermal throttle at 100 °C (−10 Pthermal risk). Accuracy suite was empty until the GGML backend load path was fixed; limit=50 is running. After it finishes, refresh this table from `submission.json`, then record the demo video (GATE1.md). Human remaining: airplane-mode EN+SW proof, ≤2 min video, DevPost draft.

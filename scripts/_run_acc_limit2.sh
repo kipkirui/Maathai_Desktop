@@ -21,6 +21,6 @@ cp -f "$MODEL_DST" /tmp/maathai-model/qwen2.5-3b-instruct-q4_k_m.gguf
 echo "HF_HOME=$HF_HOME"
 echo "MODEL=$MODEL_DST"
 /usr/bin/time -f 'ELAPSED %e' \
-  .venv-wsl/bin/python3.11 scripts/run_maathai_accuracy.py \
+  .venv-wsl/bin/python scripts/run_maathai_accuracy.py \
   --model-path "$MODEL_DST" \
   --limit 2

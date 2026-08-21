@@ -10,7 +10,7 @@ from pathlib import Path
 # Ensure this scripts/ dir is importable for maathai_lm_eval_model
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import maathai_lm_eval_model  # noqa: F401  — registers model
+import maathai_lm_eval_model  # noqa: F401  — registers model + GGML backends
 from lm_eval import simple_evaluate
 
 

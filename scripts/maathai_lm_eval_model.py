@@ -1,12 +1,33 @@
 """lm_eval model backed by llama-cpp-python (legacy echo logprobs)."""
 from __future__ import annotations
 
+import os
+import sys
+from pathlib import Path
 from typing import Any
 
 from lm_eval.api.instance import Instance
 from lm_eval.api.model import LM
 from lm_eval.api.registry import register_model
 from tqdm import tqdm
+
+
+def _ensure_ggml_backends() -> None:
+    """llama-cpp-python needs site-packages/lib on LD_LIBRARY_PATH or load fails."""
+    for lib_dir in Path(sys.prefix).glob("lib/python*/site-packages/lib"):
+        if not (lib_dir / "libggml-cpu.so.0").exists() and not (lib_dir / "libggml-cpu.so").exists():
+            continue
+        os.environ["GGML_BACKEND_DIR"] = str(lib_dir)
+        existing = os.environ.get("LD_LIBRARY_PATH", "")
+        prefix = str(lib_dir)
+        if prefix not in existing.split(os.pathsep):
+            os.environ["LD_LIBRARY_PATH"] = (
+                prefix if not existing else f"{prefix}{os.pathsep}{existing}"
+            )
+        return
+
+
+_ensure_ggml_backends()
 
 
 def _get_result(logprobs: dict, context_length: int):
@@ -53,6 +74,7 @@ class MaathaiLlamaCpp(LM):
         **kwargs: Any,
     ) -> None:
         super().__init__()
+        _ensure_ggml_backends()
         from llama_cpp import Llama
 
         # lm_eval may pass pretrained= / model_path=; strip accidental nesting

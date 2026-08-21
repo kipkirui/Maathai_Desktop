@@ -47,6 +47,16 @@ fi
 # shellcheck disable=SC1091
 source "$VENV/bin/activate"
 export PATH="$LLAMA_DIR:$PATH"
+if [[ -d "$LLAMA_DIR/llama-b10509" ]]; then
+  export LD_LIBRARY_PATH="$LLAMA_DIR/llama-b10509${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+fi
+for d in "$VENV"/lib/python*/site-packages/lib; do
+  if [[ -e "$d/libggml-cpu.so.0" || -e "$d/libggml-cpu.so" ]]; then
+    export GGML_BACKEND_DIR="$d"
+    export LD_LIBRARY_PATH="$d${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    break
+  fi
+done
 cd "$REPO_ROOT"
 
 export OMP_NUM_THREADS=4
@@ -61,7 +71,8 @@ fi
 echo ""
 if [[ "$FULL" -eq 1 ]]; then
   echo "→ adtc-profiler (participant, FULL / accuracy ON) — Gate 1 artifact..."
-  echo "   Can take 30–90+ minutes."
+  echo "   Can take several hours (ARC-Easy limit=50)."
+  python3 "$SCRIPT_DIR/patch_adtc_accuracy_runner.py"
   "${PROFILER_CMD[@]}" \
     --submission . \
     --mode participant \

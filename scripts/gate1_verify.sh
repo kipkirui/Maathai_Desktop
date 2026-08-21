@@ -143,21 +143,48 @@ VENV="$REPO_ROOT/.venv-wsl"
 if [[ -x "$LLAMA_DIR/llama-bench" ]]; then
   export PATH="$LLAMA_DIR:$PATH"
 fi
-# Prefer Python 3.11 entrypoints — mixed 3.10/3.11 venvs put lm_eval only on 3.11
+# llama-server/llama-bench are often symlinks; .so files live next to the real binary
+if [[ -d "$LLAMA_DIR/llama-b10509" ]]; then
+  export LD_LIBRARY_PATH="$LLAMA_DIR/llama-b10509${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+fi
+
+pick_venv_python() {
+  local v="$1" c
+  for c in "$v/bin/python" "$v/bin/python3" "$v/bin/python3.12" "$v/bin/python3.11"; do
+    if [[ -x "$c" ]] && "$c" -c "import lm_eval" >/dev/null 2>&1; then
+      echo "$c"
+      return 0
+    fi
+  done
+  for c in "$v/bin/python" "$v/bin/python3"; do
+    if [[ -x "$c" ]]; then
+      echo "$c"
+      return 0
+    fi
+  done
+  return 1
+}
+
+VPY=""
 ADTC_BIN=""
-if [[ -x "$VENV/bin/python3.11" && -x "$VENV/bin/adtc-profiler" ]]; then
+if [[ -x "$VENV/bin/adtc-profiler" ]]; then
   export PATH="$VENV/bin:$PATH"
   ADTC_BIN="$VENV/bin/adtc-profiler"
-  # Verify accuracy import on the same interpreter adtc-profiler uses
-  if ! "$VENV/bin/python3.11" -c "import lm_eval" >/dev/null 2>&1; then
-    echo "⚠ lm_eval missing for python3.11 — installing accuracy stack..."
-    "$VENV/bin/python3.11" -m pip install -q "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
+  VPY="$(pick_venv_python "$VENV" || true)"
+  if [[ -n "$VPY" ]] && ! "$VPY" -c "import lm_eval" >/dev/null 2>&1; then
+    echo "⚠ lm_eval missing — installing accuracy stack into venv..."
+    "$VPY" -m pip install -q "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"
   fi
-elif [[ -x "$VENV/bin/adtc-profiler" ]]; then
-  # shellcheck disable=SC1091
-  source "$VENV/bin/activate"
-  ADTC_BIN="$(command -v adtc-profiler)"
 fi
+
+# llama-cpp-python needs bundled ggml CPU backends or GGUF load fails
+for d in "$VENV"/lib/python*/site-packages/lib; do
+  if [[ -e "$d/libggml-cpu.so.0" || -e "$d/libggml-cpu.so" ]]; then
+    export GGML_BACKEND_DIR="$d"
+    export LD_LIBRARY_PATH="$d${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    break
+  fi
+done
 
 if ! command -v llama-bench >/dev/null 2>&1; then
   echo ""
@@ -179,17 +206,20 @@ if [[ -z "$ADTC_BIN" ]] || [[ ! -x "$ADTC_BIN" ]]; then
     ADTC_BIN="$(command -v adtc-profiler)"
   else
     echo "adtc-profiler not found. Install:"
-    echo '  python3.11 -m pip install "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"'
+    echo '  python3 -m pip install "git+https://github.com/Africa-Deep-Tech-Foundation/adtc-profiler.git"'
     exit 1
   fi
 fi
 
 echo "✓ llama-bench : $(command -v llama-bench)"
 echo "✓ adtc-profiler: $ADTC_BIN"
-if "$VENV/bin/python3.11" -c "import lm_eval" >/dev/null 2>&1; then
-  echo "✓ lm_eval     : available (python3.11)"
+if [[ -n "$VPY" ]] && "$VPY" -c "import lm_eval" >/dev/null 2>&1; then
+  echo "✓ lm_eval     : available ($VPY)"
 else
   echo "⚠ lm_eval     : missing — accuracy may be empty"
+fi
+if [[ -n "${GGML_BACKEND_DIR:-}" ]]; then
+  echo "✓ ggml backends: $GGML_BACKEND_DIR"
 fi
 
 export OMP_NUM_THREADS=4
@@ -213,8 +243,8 @@ else
   echo "→ preparing FULL accuracy run (llama-cpp-python lm_eval backend)..."
   # Upstream lm_eval --model gguf + llama-server cannot score loglikelihood on
   # current OpenAI logprobs. Use Maathai runner via patched adtc accuracy.py.
-  if [[ -x "$VENV/bin/python3.11" ]]; then
-    "$VENV/bin/python3.11" "$SCRIPT_DIR/patch_adtc_accuracy_runner.py"
+  if [[ -n "$VPY" ]]; then
+    "$VPY" "$SCRIPT_DIR/patch_adtc_accuracy_runner.py"
   else
     python3 "$SCRIPT_DIR/patch_adtc_accuracy_runner.py"
   fi

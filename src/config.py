@@ -50,7 +50,7 @@ SAMPLER_CONFIG = {
     "top_k": 40,
     "top_p": 0.95,
     "repeat_penalty": 1.1,
-    "max_tokens": 512,
+    "max_tokens": 256,
 }
 
 # Dynamic token budget: context_length − estimated_prompt_tokens − buffer

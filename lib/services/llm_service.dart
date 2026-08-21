@@ -70,7 +70,8 @@ class LlmService {
       '--flash-attn', flashAttn ? 'on' : 'off',
       '--cache-type-k', cacheTypeK,
       '--cache-type-v', cacheTypeV,
-      '--prio', processPrio.toString(),
+      // --prio 1 requires CAP_SYS_NICE; unprivileged users get EPERM every token
+      if (processPrio != 0) ...['--prio', processPrio.toString()],
       // mmap left enabled (faster TPS than --no-mmap in sweeps)
       if (mlock) '--mlock',
       '--log-disable',
@@ -85,7 +86,7 @@ class LlmService {
       'GGML_BLAS_NUM_THREADS': threads.toString(),
       'MKL_NUM_THREADS': threads.toString(),
     };
-    final libDir = File(binary).parent.path;
+    final libDir = _libraryDir(binary);
     final existingLd = env['LD_LIBRARY_PATH'];
     env['LD_LIBRARY_PATH'] =
         existingLd == null || existingLd.isEmpty ? libDir : '$libDir:$existingLd';
@@ -136,6 +137,15 @@ class LlmService {
       return response.statusCode == 200;
     } catch (_) {
       return false;
+    }
+  }
+
+  /// Directory that actually contains ggml `.so` files (follow llama-server symlink).
+  String _libraryDir(String binary) {
+    try {
+      return File(File(binary).resolveSymbolicLinksSync()).parent.path;
+    } catch (_) {
+      return File(binary).parent.path;
     }
   }
 

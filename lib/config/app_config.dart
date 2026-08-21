@@ -21,7 +21,7 @@ class AppConfig {
   static const int defaultGpuLayers = 0; // CPU-only for competition hardware
   static const bool defaultFlashAttn = true; // +~15% gen TPS vs flash-attn off in WSL sweep
   static const bool defaultMlock = true; // keep weights resident; peak RSS still ~3.3 GB ≪ 7 GB
-  static const int defaultProcessPrio = 1; // medium; improves scheduling under UI load
+  static const int defaultProcessPrio = 0; // 0 = omit --prio; 1 needs CAP_SYS_NICE and spam-fails EPERM
   // KV cache: f16 is fastest here; q8_0 saves RAM (~same TPS). Keep f16 for Sperf.
   static const String defaultCacheTypeK = 'f16';
   static const String defaultCacheTypeV = 'f16';
@@ -31,7 +31,7 @@ class AppConfig {
   static const int defaultTopK = 40;
   static const double defaultTopP = 0.95;
   static const double defaultRepeatPenalty = 1.1;
-  static const int defaultMaxTokens = 512;
+  static const int defaultMaxTokens = 256; // cap replies; 512 is slow on 15W U-CPUs
 
   // RAG settings
   static const int ragTopK = 3;
