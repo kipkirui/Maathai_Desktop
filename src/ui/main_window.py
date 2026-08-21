@@ -207,7 +207,10 @@ class MainWindow(QMainWindow):
         file_menu.addAction(new_chat)
 
         file_menu.addSeparator()
-        file_menu.addAction("&Quit", QApplication.quit, "Ctrl+Q")
+        quit_action = QAction("&Quit", self)
+        quit_action.setShortcut(QKeySequence("Ctrl+Q"))
+        quit_action.triggered.connect(QApplication.quit)
+        file_menu.addAction(quit_action)
 
         help_menu = menu.addMenu("&Help")
         about_action = QAction("&About Maathai", self)

@@ -44,7 +44,7 @@ class LlmService {
   }) async {
     await stopServer();
 
-    _port = port;
+    _port = await _freePort(port);
     _serverReady = false;
 
     // Find the llama-server binary (PATH or bundled)
@@ -60,7 +60,7 @@ class LlmService {
     final args = <String>[
       '--model', modelPath,
       '--host', AppConfig.llamaServerHost,
-      '--port', port.toString(),
+      '--port', _port.toString(),
       '--ctx-size', contextSize.toString(),
       '--threads', threads.toString(),
       '--threads-batch', threadsBatch.toString(),
@@ -85,6 +85,10 @@ class LlmService {
       'GGML_BLAS_NUM_THREADS': threads.toString(),
       'MKL_NUM_THREADS': threads.toString(),
     };
+    final libDir = File(binary).parent.path;
+    final existingLd = env['LD_LIBRARY_PATH'];
+    env['LD_LIBRARY_PATH'] =
+        existingLd == null || existingLd.isEmpty ? libDir : '$libDir:$existingLd';
 
     _serverProcess = await Process.start(binary, args, environment: env);
     AppLog.info(
@@ -140,10 +144,15 @@ class LlmService {
         ? ['llama-server.exe', 'llama-server']
         : ['llama-server'];
 
-    // 1. Bundled with repo (scripts/install_llama_server_windows.ps1)
+    // 1. Bundled with repo (Windows tools/llama, Linux tools/llama-linux)
     for (final name in localNames) {
-      final bundled = p.join(Directory.current.path, 'tools', 'llama', name);
-      if (await File(bundled).exists()) return bundled;
+      for (final dir in [
+        p.join(Directory.current.path, 'tools', 'llama'),
+        p.join(Directory.current.path, 'tools', 'llama-linux'),
+      ]) {
+        final bundled = p.join(dir, name);
+        if (await File(bundled).exists()) return bundled;
+      }
     }
 
     // 2. Next to Flutter executable (release builds)
@@ -181,6 +190,22 @@ class LlmService {
     }
 
     return null;
+  }
+
+  /// Prefer [preferred], otherwise bind an ephemeral localhost port.
+  Future<int> _freePort(int preferred) async {
+    try {
+      final socket = await ServerSocket.bind(InternetAddress.loopbackIPv4, preferred);
+      final port = socket.port;
+      await socket.close();
+      return port;
+    } catch (_) {
+      final socket = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+      final port = socket.port;
+      await socket.close();
+      AppLog.info('LlmService', 'Port $preferred in use; using $port');
+      return port;
+    }
   }
 
   /// Streams tokens from llama-server via Server-Sent Events.

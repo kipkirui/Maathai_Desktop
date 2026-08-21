@@ -19,6 +19,26 @@ from src.config import INFERENCE_CONFIG, SAMPLER_CONFIG, TOKEN_BUFFER, TOKENS_PE
 logger = logging.getLogger(__name__)
 
 
+def _ensure_ggml_backends() -> None:
+    """Point llama-cpp-python at its bundled ggml CPU backend (site-packages/lib)."""
+    import os
+    import sys
+    from pathlib import Path
+
+    for lib_dir in Path(sys.prefix).glob("lib/python*/site-packages/lib"):
+        if not (lib_dir / "libggml-cpu.so.0").exists() and not (lib_dir / "libggml-cpu.so").exists():
+            continue
+        os.environ["GGML_BACKEND_DIR"] = str(lib_dir)
+        existing = os.environ.get("LD_LIBRARY_PATH", "")
+        prefix = str(lib_dir)
+        if prefix not in existing.split(os.pathsep):
+            os.environ["LD_LIBRARY_PATH"] = (
+                prefix if not existing else f"{prefix}{os.pathsep}{existing}"
+            )
+        logger.debug("GGML backend dir: %s", lib_dir)
+        return
+
+
 class LlamaInference:
     """
     llama-cpp-python wrapper with streaming support.
@@ -147,6 +167,7 @@ class LlamaInference:
             )
 
         logger.info("Loading model: %s", model_path)
+        _ensure_ggml_backends()
 
         from llama_cpp import Llama  # noqa: PLC0415
 
