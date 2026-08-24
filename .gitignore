@@ -1,7 +1,8 @@
 # ─── ADTC Competition — model weights must NEVER be committed ─────────────────
 *.gguf
 model/*.gguf
-model/
+model/*
+!model/.gitkeep
 
 # ─── llama.cpp binaries (installed locally, not committed) ───────────────────
 tools/llama/

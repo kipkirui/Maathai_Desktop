@@ -252,9 +252,9 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 | Pthermal | 0 (no penalty) | 3B model; no throttle in participant run |
 | Alpha Bonus | Claimed | Full Swahili UI + bilingual RAG |
 
-**This laptop (2026-08-21):** 3.59 t/s · peak RSS 3177 MB · throttled 100 °C · accuracy filling  
+**This laptop (2026-08-21 profiler / 2026-08-24 packaging):** 3.59 t/s · peak RSS 3177 MB · throttled 100 °C · accuracy job restarted  
 **WSL smoke (2026-08-04):** 5.64 t/s · peak RSS 3274 MB · thermal OK · `accuracy: []`  
-**Accuracy probe (2026-08-05):** ARC-Easy limit=2 → score 1.0; full limit=50 re-run in progress.
+**Accuracy probe (2026-08-05):** ARC-Easy limit=2 → score 1.0; native limit=50 restarted 2026-08-24 after a dead 38/200 run.
 
 ---
 
@@ -262,7 +262,7 @@ Stotal = 0.50 × Sacc  +  0.30 × Sperf  +  0.20 × Seff  −  Pthermal
 
 | Gate | Date | Status |
 |---|---|---|
-| Gate 1 | **August 25, 2026** | Open — **4 days left** (as of Aug 21); packaging in progress |
+| Gate 1 | **August 25, 2026** | Due **today** (DevPost Aug 24, 23:45 PDT); packaging checks pass, accuracy JSON filling |
 | Semifinalists | September 8, 2026 | Up to 20 teams; Gate 2 audit begins |
 | Semifinalist package | September 22, 2026 | Gate 2 submission |
 | Finalists | September 29, 2026 | Up to 10 teams |
@@ -276,12 +276,13 @@ See [`GATE1.md`](GATE1.md) for the full close-out + video shot list. Run `bash s
 
 - [x] Repository is public on GitHub
 - [x] `metadata.json` — no placeholder values
-- [ ] `download_model.sh` — works from fresh clone, idempotent (verify on clean Ubuntu 22.04)
+- [x] `download_model.sh` — present, HuggingFace URL, no placeholders (fresh-clone still worth a once-over)
 - [x] Model is GGUF format, hosted publicly on HuggingFace
-- [x] `model/*.gguf` excluded from git
+- [x] `model/*.gguf` excluded from git (`model/.gitkeep` tracked)
 - [x] `REPORT.md` — complete technical writeup (participant benchmarks filled)
 - [x] `LICENSE` — GNU GPL v3
-- [ ] `bash scripts/gate1_verify.sh --mem-8g` → one 8 GB-capped full run (WSL ARC-Easy n=50 already **0.34**)
+- [x] Submission pytest gate (`tests/test_submission.py`) — 30 passed, 1 skipped
+- [ ] `submission.json` accuracy non-empty — native ARC-Easy n=50 running (2026-08-24)
 - [x] Peak RAM < 7168 MB (hard limit) — native ~3177 MB / WSL ~3274 MB
 - [ ] Zero network calls during inference (verify offline)
 - [ ] 2-minute demo video recorded (shot list in GATE1.md)

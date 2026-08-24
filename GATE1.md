@@ -63,7 +63,7 @@ After a full run:
 | 1 | Repo **public** on GitHub | ✅ `kipkirui/Maathai_Desktop` is already public |
 | 2 | `git ls-files '*.gguf'` empty | Never commit weights |
 | 3 | Fresh-clone `bash download_model.sh` on Ubuntu | Same machine judges use profile |
-| 4 | Full profiler JSON with accuracy | `gate1_verify.sh` (no `--smoke`) |
+| 4 | Full profiler JSON with accuracy | RAM/TPS on disk; native ARC-Easy n=50 restarted 2026-08-24 |
 | 5 | Offline proof (airplane mode) | One EN + one SW chat |
 | 6 | Demo video ≤ 2:00 uploaded | Shot list below |
 | 7 | DevPost form + Git commit hash URL | Submit early; edit until deadline |
