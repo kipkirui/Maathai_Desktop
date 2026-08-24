@@ -106,7 +106,7 @@ A 3B model at 15–20 TPS sustained inference keeps CPU temperature well below 8
 | RAG (pure Dart TF-IDF) | ✅ Complete | Bilingual KB across crops/pests/livestock/soil/markets/calendars |
 | Desktop UI | ✅ Mostly complete | Chat / Knowledge / Models / Settings; minor polish left |
 | Swahili UI + RAG `content_sw` | ✅ Complete | Needs terminology QA pass before video |
-| `metadata.json` | ✅ Complete | Team `1060310`, 2 prompts, alpha + budget claims |
+| `metadata.json` | ✅ Complete | Team `maathai-desktop`, 2 prompts, alpha + budget claims |
 | `REPORT.md` | ✅ Draft complete | Native 2026-08-21 numbers in; refresh after 8 GB full run |
 | Participant smoke profiler | ✅ Done | Native: peak RSS **3177 MB**, **3.59 t/s**, thermal WARN. WSL: ~3274 MB, 5.6–7.7 t/s |
 | Tuned llama-server flags | ✅ Documented | flash-attn / batch 2048 / threads=4 |
@@ -202,7 +202,7 @@ Before submitting on DevPost, every item must be checked:
 - [ ] `.venv/`, `__pycache__/`, `*.pyc` excluded
 
 ### `metadata.json`
-- [x] `team_id` — `1060310`
+- [x] `team_id` — `maathai-desktop`
 - [x] `domain: "agriculture"` — correct
 - [x] `language_scope: ["en", "sw"]` — English + Swahili
 - [x] `african_alpha_claim: true` — Swahili support is live

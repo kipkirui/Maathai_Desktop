@@ -1,7 +1,7 @@
 # Gate 1 Close-Out — Maathai Desktop
 
 **Deadline:** August 25, 2026 (DevPost: Aug 24, 2026 @ 11:45pm PDT)  
-**Team:** 1060310 · Agriculture · Qwen2.5-3B-Instruct Q4_K_M
+**Team:** maathai-desktop · Agriculture · Qwen2.5-3B-Instruct Q4_K_M
 
 Gate 1 is packaging: public repo + `REPORT.md` + working prototype evidence + ≤2 min video. Finish technical verify first, then film.
 
@@ -76,7 +76,7 @@ Target total **~1:50**. Record 1080p; voiceover or on-screen captions OK.
 
 | Time | Shot | What to show / say |
 |---|---|---|
-| 0:00–0:15 | Title | “Maathai Desktop — offline agriculture AI for 8 GB laptops. ADTC 2026, Team 1060310.” |
+| 0:00–0:15 | Title | “Maathai Desktop — offline agriculture AI for 8 GB laptops. ADTC 2026, Team maathai-desktop.” |
 | 0:15–0:30 | Boot + offline | App open; status shows model loaded; mention **no internet** (airplane mode icon or unplugged). |
 | 0:30–1:00 | English Q&A (`tp_001`) | Paste maize yellowing / Nakuru prompt. Stream answer. Call out **specific treatment** (e.g. CAN rate) from RAG. |
 | 1:00–1:25 | Swahili | Switch language → ask one short crop question in Kiswahili → show Swahili reply (African Alpha claim). |

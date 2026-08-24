@@ -1,6 +1,6 @@
 # Technical Report — Maathai Desktop
 
-**Team ID:** 1060310  
+**Team ID:** maathai-desktop  
 **Domain:** agriculture  
 **Model:** Qwen2.5-3B-Instruct-Q4_K_M  
 **Quantization:** GGUF Q4_K_M
