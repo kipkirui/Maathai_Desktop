@@ -222,9 +222,13 @@ class _ChatScreenState extends State<ChatScreen> {
               focusNode: _keyboardFocus,
               onKeyEvent: (event) {
                 if (event is KeyDownEvent) {
-                  final isEnter = event.logicalKey == LogicalKeyboardKey.enter;
+                  final isEnter = event.logicalKey == LogicalKeyboardKey.enter ||
+                      event.logicalKey == LogicalKeyboardKey.numpadEnter;
+                  final isShift = HardwareKeyboard.instance.isShiftPressed;
                   final isCtrl = HardwareKeyboard.instance.isControlPressed;
-                  if (isEnter && isCtrl && !isGenerating) {
+                  if (isEnter && !isShift && !isGenerating) {
+                    _sendMessage();
+                  } else if (isEnter && isCtrl && !isGenerating) {
                     _sendMessage();
                   }
                 }
@@ -234,6 +238,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 focusNode: _inputFocus,
                 maxLines: 5,
                 minLines: 1,
+                onSubmitted: (_) {
+                  if (!isGenerating) _sendMessage();
+                },
                 decoration: InputDecoration(
                   hintText: t.t('chat_placeholder'),
                   border: OutlineInputBorder(
@@ -245,7 +252,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 enabled: !isGenerating,
-                textInputAction: TextInputAction.newline,
+                textInputAction: TextInputAction.send,
               ),
             ),
           ),
@@ -261,10 +268,16 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             )
           else
-            FilledButton.icon(
-              onPressed: _inputController.text.trim().isEmpty ? null : _sendMessage,
-              icon: const Icon(Icons.send),
-              label: Text(t.t('send')),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _inputController,
+              builder: (context, value, _) {
+                final hasText = value.text.trim().isNotEmpty;
+                return FilledButton.icon(
+                  onPressed: hasText ? _sendMessage : null,
+                  icon: const Icon(Icons.send),
+                  label: Text(t.t('send')),
+                );
+              },
             ),
         ],
       ),
